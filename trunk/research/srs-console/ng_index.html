@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html ng-app="scApp">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>SrsConsole</title>
+    <link rel="stylesheet" type="text/css" href="js/3rdparty/bootstrap.min.css"/>
+    <style>
+        body {
+            padding-top: 0px;
+        }
+    </style>
+</head>
+<body ng-controller="CSCMain">
+    <div class="container">
+        <div bravo-alert class="alert fade in {{log.level|sc_filter_log_level}}" ng-repeat="log in logs">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong>{{log.level}}:</strong> {{log.msg}}
+        </div>
+        <div ng-view></div>
+        <div id="footer">
+            <hr>
+            <footer>
+                <p>SrsTeam&copy; Company 2015</p>
+            </footer>
+        </div>
+    </div>
+    <script type="text/javascript" src="js/3rdparty/angular.min.js"></script>
+    <script type="text/javascript" src="js/3rdparty/angular-route.min.js"></script>
+    <script type="text/javascript" src="js/3rdparty/angular-resource.min.js"></script>
+    <script type="text/javascript" src="js/bravo_alert/alert.js"></script>
+    <script type="text/javascript" src="js/srs.console.js"></script>
+</body>
+</html>
