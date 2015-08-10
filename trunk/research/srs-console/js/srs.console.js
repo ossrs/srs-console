@@ -10,6 +10,7 @@ scApp.controller("CSCMain", ["$scope", function($scope){
 }]);
 
 scApp.controller("CSCSummary", ["$scope", function($scope){
+    $scope.logs.push({code: 101, level:"warn", msg:"Summary fake error."});
 }]);
 
 scApp.filter("sc_filter_log_level", function(){
