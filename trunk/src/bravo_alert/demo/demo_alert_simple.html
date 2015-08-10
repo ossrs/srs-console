@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html ng-app="bravoUiAlert">
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>bravo alert</title>
+        <link rel="stylesheet" type="text/css" href="../../vendor/bootstrap.min.css"/>
+        <script type="text/javascript" src="../../vendor/angular.min.js"></script>
+        <script type="text/javascript" src="alert.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div><h3>bravo alert simple demo</h3></div>
+            <div><h4>1. 简单的显示警告框内容</h4></div>
+            <div bravo-alert class="alert fade in">
+                <strong>Hi, penny!</strong> you have a alert to show some msgs here.
+            </div>
+            <div><h4>2. 将<code>data-dismiss="alert"</code>添加到关闭按钮,即可赋予某个警告框关闭的功能。</h4></div>
+            <div bravo-alert class="alert fade in">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
+            </div>
+        </div>
+    </body>
+</html>

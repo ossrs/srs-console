@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html ng-app="userApp">
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>bravo alert</title>
+        <link rel="stylesheet" type="text/css" href="../../vendor/bootstrap.min.css"/>
+        <script type="text/javascript" src="../../vendor/angular.min.js"></script>
+        <script type="text/javascript" src="alert.js"></script>
+        <script type="text/javascript" src="demo.js"></script>
+    </head>
+    <body ng-controller="UserAlertController">
+        <div class="container">
+            <div><h3>bravo alert complex demo</h3></div>
+            <div><h4>1.展示更复杂的警告框内容</h4></div>
+            <div bravo-alert class="alert alert-block alert-error fade in">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <h4 class="alert-heading">Oh snap! You got an error!</h4>
+                <p>Change this and that and try again. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.</p>
+                <p>
+                    <a class="btn btn-danger" ng-click="take_this_action()">Take this action</a> <a class="btn" ng-click="or_do_this_action()">Or do this</a>
+                </p>
+            </div>
+            <div>
+                <h4>2.alert close与closed事件监听</h4>
+                <p><code>bravo-alert-close="your_close_callback()"</code>close事件callback函数,添加到attr</p>
+                <p><code>bravo-alert-closed="your_closed_callback()"</code>closed事件callback函数,添加到attr</p>
+            </div>
+            <div bravo-alert class="alert alert-block alert-error fade in"
+                 bravo-alert-close="alert_complex_close()" bravo-alert-closed="alert_complex_closed()">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <h4 class="alert-heading">Oh snap! You got an error!</h4>
+                <p>Change this and that and try again. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.</p>
+                <p>
+                    <a class="btn btn-danger" ng-click="take_this_action()">Take this action</a> <a class="btn" ng-click="or_do_this_action()">Or do this</a>
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

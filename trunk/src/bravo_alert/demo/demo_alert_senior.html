@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html ng-app="userApp">
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>bravo alert</title>
+        <link rel="stylesheet" type="text/css" href="../../vendor/bootstrap.min.css"/>
+        <script type="text/javascript" src="../../vendor/angular.min.js"></script>
+        <script type="text/javascript" src="alert.js"></script>
+        <script type="text/javascript" src="demo.js"></script>
+    </head>
+    <body ng-controller="UserAlertController">
+        <div class="container">
+            <div><h3>bravo alert senior demo</h3></div>
+            <div>
+                <h4>指令外部控制alert的显示与关闭</h4>
+                <p><code>ng-show="your_scope_controller_variable"</code>添加到attr。</p>
+            </div>
+            <div bravo-alert class="alert alert-block alert-error fade in" ng-show="alert_show_complex"
+                 bravo-alert-close="alert_complex_close()" bravo-alert-closed="alert_complex_closed()">
+                <h4 class="alert-heading">Oh snap! You got an error!</h4>
+                <p>Change this and that and try again. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.</p>
+            </div>
+            <button ng-click="alert_complex_close()" class="btn btn-info">close alert</button>
+            <button ng-click="alert_complex_show()" class="btn btn-info">show alert</button>
+        </div>
+    </body>
+</html>
