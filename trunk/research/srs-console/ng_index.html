@@ -12,7 +12,8 @@
 </head>
 <body ng-controller="CSCMain">
     <div class="container">
-        <div bravo-alert class="alert fade in {{log.level|sc_filter_log_level}}" ng-repeat="log in logs">
+        <div bravo-alert ng-repeat="log in logs" alert-show="!log.removed"
+             class="alert fade in {{log.level|sc_filter_log_level}}">
             <button type="button" class="close" data-dismiss="alert">×</button>
             <strong>{{log.level}}:</strong> {{log.msg}}
         </div>
