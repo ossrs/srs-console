@@ -3,10 +3,7 @@
     <head lang="en">
         <meta charset="UTF-8">
         <title>bravo alert</title>
-        <link rel="stylesheet" type="text/css" href="../../vendor/bootstrap.min.css"/>
-        <script type="text/javascript" src="../../vendor/angular.min.js"></script>
-        <script type="text/javascript" src="alert.js"></script>
-        <script type="text/javascript" src="demo.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../3rdparty/bootstrap.min.css"/>
     </head>
     <body ng-controller="UserAlertController">
         <div class="container">
@@ -35,5 +32,30 @@
                 </p>
             </div>
         </div>
+        <script type="text/javascript" src="../../3rdparty/angular.min.js"></script>
+        <script type="text/javascript" src="../alert.js"></script>
+        <script>
+            angular.module('userApp', ['bravoUiAlert'])
+                    .controller('UserAlertController', ['$scope', function ($scope) {
+                        $scope.alert_complex_close = function () {
+                            $scope.alert_show_complex = false;
+                            console.log("alert_complex close");
+                            alert("alert_complex close");
+                        };
+                        $scope.alert_complex_closed = function () {
+                            console.log("alert_complex closed");
+                            alert("alert_complex closed");
+                        };
+                        $scope.take_this_action = function () {
+                            console.log("take this action");
+                            alert("take this action, do something...");
+                        };
+                        $scope.or_do_this_action = function () {
+                            console.log("or do this action");
+                            alert("or do this action, do something...");
+                        };
+                        $scope.alert_show_complex = true;
+                    }]);
+        </script>
     </body>
 </html>

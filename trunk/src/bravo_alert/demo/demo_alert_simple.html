@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html ng-app="bravoUiAlert">
+<html ng-app="userApp">
     <head lang="en">
         <meta charset="UTF-8">
         <title>bravo alert</title>
-        <link rel="stylesheet" type="text/css" href="../../vendor/bootstrap.min.css"/>
-        <script type="text/javascript" src="../../vendor/angular.min.js"></script>
-        <script type="text/javascript" src="alert.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../3rdparty/bootstrap.min.css"/>
     </head>
     <body>
         <div class="container">
@@ -20,5 +18,10 @@
                 <strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
             </div>
         </div>
+        <script type="text/javascript" src="../../3rdparty/angular.min.js"></script>
+        <script type="text/javascript" src="../alert.js"></script>
+        <script>
+            angular.module('userApp', ['bravoUiAlert']);
+        </script>
     </body>
 </html>

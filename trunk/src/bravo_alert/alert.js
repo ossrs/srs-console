@@ -5,7 +5,7 @@ angular.module('bravoUiAlert', [])
             transclude: true,
             template: '<div ng-transclude></div>',
             scope: {
-                alert_show: '=ngShow',
+                alert_show: '=alertShow',
                 on_close: '&bravoAlertClose',
                 on_closed: '&bravoAlertClosed'
             },

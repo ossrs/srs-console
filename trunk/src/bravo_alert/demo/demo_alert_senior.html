@@ -3,19 +3,16 @@
     <head lang="en">
         <meta charset="UTF-8">
         <title>bravo alert</title>
-        <link rel="stylesheet" type="text/css" href="../../vendor/bootstrap.min.css"/>
-        <script type="text/javascript" src="../../vendor/angular.min.js"></script>
-        <script type="text/javascript" src="alert.js"></script>
-        <script type="text/javascript" src="demo.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../3rdparty/bootstrap.min.css"/>
     </head>
     <body ng-controller="UserAlertController">
         <div class="container">
             <div><h3>bravo alert senior demo</h3></div>
             <div>
                 <h4>指令外部控制alert的显示与关闭</h4>
-                <p><code>ng-show="your_scope_controller_variable"</code>添加到attr。</p>
+                <p><code>alert-show="your_scope_controller_variable"</code>添加到attr。</p>
             </div>
-            <div bravo-alert class="alert alert-block alert-error fade in" ng-show="alert_show_complex"
+            <div bravo-alert class="alert alert-block alert-error fade in" alert-show="alert_show_senior"
                  bravo-alert-close="alert_complex_close()" bravo-alert-closed="alert_complex_closed()">
                 <h4 class="alert-heading">Oh snap! You got an error!</h4>
                 <p>Change this and that and try again. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.</p>
@@ -23,5 +20,25 @@
             <button ng-click="alert_complex_close()" class="btn btn-info">close alert</button>
             <button ng-click="alert_complex_show()" class="btn btn-info">show alert</button>
         </div>
+        <script type="text/javascript" src="../../3rdparty/angular.min.js"></script>
+        <script type="text/javascript" src="../alert.js"></script>
+        <script>
+            angular.module('userApp', ['bravoUiAlert'])
+                    .controller('UserAlertController', ['$scope', function ($scope) {
+                        $scope.alert_complex_close = function () {
+                            $scope.alert_show_senior = false;
+                            console.log("alert_complex close");
+                            alert("alert_complex close");
+                        };
+                        $scope.alert_complex_closed = function () {
+                            console.log("alert_complex closed");
+                            alert("alert_complex closed");
+                        };
+                        $scope.alert_complex_show = function () {
+                            $scope.alert_show_senior = true;
+                        };
+                        $scope.alert_show_senior = true;
+                    }]);
+        </script>
     </body>
 </html>
