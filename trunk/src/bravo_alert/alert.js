@@ -10,7 +10,7 @@ angular.module('bravoUiAlert', [])
                 on_closed: '&bravoAlertClosed'
             },
             compile: function (elem, attr) {
-                var manual = attr['ngShow'];
+                var manual = attr['alertShow'];
                 return function (scope, elem, attr) {
                     elem.on('click', function(event) {
                         var obj = angular.element(event.target);
