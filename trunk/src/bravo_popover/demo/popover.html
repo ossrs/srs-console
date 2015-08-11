@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html ng-app="userApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>bravo popover</title>
+    <link rel="stylesheet" type="text/css" href="../../3rdparty/bootstrap.min.css"/>
+</head>
+<body ng-controller="userPopoverController">
+    <div class="container">
+        <div><p><h3>bravo popover demo</h3></p></div>
+        <div class="container">
+            <div><p><h4>1.简单的弹出提示</h4></p></div>
+            <div class="container" style="padding-top: 20px"><p>1.1 弹出提示，有4个可选参数:top, right, bottom, left;默认为top</p></div>
+            <a bravo-popover href="#" class="btn btn-info"
+               data-content="i'am the top popover" data-title="Hi">
+                popover on top</a>
+
+            <a bravo-popover href="#" class="btn btn-success"
+               data-content="i'am the right popover"
+               data-title="Hi" data-placement="right">
+                popover on right</a>
+
+            <a bravo-popover href="#" class="btn btn-warning"
+               data-content="i'am the bottom popover"
+               data-title="Hi" data-placement="bottom">
+                popover on bottom</a>
+
+            <a bravo-popover href="#" class="btn btn-danger"
+               data-content="i'am the left popover"
+               data-title="Hi" data-placement="left">
+                popover on left</a>
+
+            <div class="container" style="padding-top: 20px"><p>1.2 trigger，popover触发方式:click|hover|focus;默认为click</p></div>
+            <a bravo-popover href="#" class="btn btn-info"
+               data-content="i'am the click popover"
+               data-title="Hi" data-placement="left">
+                popover click</a>
+
+            <input type="text" ng-model="input_value" bravo-popover data-content="i'am the focus popover"
+                   data-title="Hi" data-placement="bottom" data-trigger="focus">
+
+            <a bravo-popover href="#" class="btn btn-success"
+               data-content="i'am the hover popover"
+               data-title="Hi" data-placement="left" data-trigger="hover">
+                popover hover</a>
+        </div>
+        <div class="container" style="padding-top: 30px">
+            <div><p><h4>2.带确认按钮的弹出提示</h4></p></div>
+            <div><p><h4><code>bravo-popover-confirm="you_confirm_popover_callback()"</code>弹出提示确定按钮函数回调，添加到attr</h4></p></div>
+            <a bravo-popover href="#" class="btn btn-large btn-danger"
+               data-content="And here's some amazing content. It's very engaging. right?"
+               data-title="A Title" data-placement="top"
+               bravo-popover-confirm="do_confirm_popover()">
+                confirm弹出提示</a>
+        </div>
+        <div class="container" style="padding-top: 30px">
+            <div><p><h4>3.带确认按钮的复杂的弹出提示</h4></p></div>
+            <a bravo-popover href="#" class="btn btn-large btn-success"
+               data-content='<p>• 观止官网：<a href="http://www.chnvideo.com">chnvideo</a></p>
+        <p>• 了解更多：<a href="http://www.chnvideo.com/products-onlinevideo.html">总有一款产品能满足你的哟</a></p>'
+               data-title="复杂的弹出提示" data-placement="top"
+               bravo-popover-confirm="do_confirm_popover()">
+                复杂的弹出提示</a>
+        </div>
+    </div>
+    <script type="text/javascript" src="../../3rdparty/angular.js"></script>
+    <script type="text/javascript" src="../popover.js"></script>
+    <script>
+        angular.module('userApp', ['bravoUiPopover'])
+            .controller('userPopoverController', ['$scope', function ($scope) {
+                $scope.do_confirm_popover = function (user) {
+                    console.log("do confirm popover");
+                    alert("do confirm popover");
+                };
+                $scope.input_value = "hello, i'm on focus";
+            }]);
+    </script>
+</body>
+</html>
