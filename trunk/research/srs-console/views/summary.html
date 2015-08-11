@@ -1,1 +1,8 @@
-Server {{server.version}}
+<div>
+    Server
+    <a bravo-popover href="javascript:void(0)"
+        data-content="{{server.pid}} at {{server.argv}}"
+        data-title="SRS/{{server.version}}" data-placement="bottom" data-trigger="hover">
+        {{server.version}}
+    </a>
+</div>

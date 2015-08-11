@@ -1,4 +1,6 @@
-var scApp = angular.module("scApp", ["ngRoute", "ngResource", "bravoUiAlert"]);
+var scApp = angular.module("scApp", ["ngRoute", "ngResource",
+    "bravoUiAlert", "bravoUiPopover"
+]);
 
 scApp.config(["$routeProvider", function($routeProvider){
     $routeProvider.otherwise({redirectTo:"/summaries"})
