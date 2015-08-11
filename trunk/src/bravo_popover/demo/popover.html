@@ -12,7 +12,7 @@
             <div><p><h4>1.简单的弹出提示</h4></p></div>
             <div class="container" style="padding-top: 20px"><p>1.1 弹出提示，有4个可选参数:top, right, bottom, left;默认为top</p></div>
             <a bravo-popover href="#" class="btn btn-info"
-               data-content="i'am the top popover" data-title="Hi">
+               data-content="<div>{{test}}</div>" data-title="Hi">
                 popover on top</a>
 
             <a bravo-popover href="#" class="btn btn-success"
@@ -73,6 +73,7 @@
                     alert("do confirm popover");
                 };
                 $scope.input_value = "hello, i'm on focus";
+                $scope.test="123";
             }]);
     </script>
 </body>

@@ -1,5 +1,7 @@
 angular.module('bravoUiPopover', [])
-    .directive("bravoPopover", function($compile, $position){
+    .directive("bravoPopover", function($compile, $position, $sce){
+        // $parse : ng表达式 {{1+2}} {{text}}
+        // $compile : 编译一段html字符串（可以包括ng表达式）
         return {
             restrict: "A",
             scope: {
@@ -14,15 +16,15 @@ angular.module('bravoUiPopover', [])
                     '<div class="popover fade {{placement}} in" ng-show="popoover_show == \'in\'">' +
                         '<div class="arrow"></div>' +
                         '<h3 class="popover-title">{{title}}</h3>' +
-                        '<div class="popover-content">' +
-                            attr['content'] + confirm_template +
+                        '<div class="popover-content" ng-bind-html="content">' +
+                        confirm_template +
                         '</div>' +
                     '</div>';
                 var linker = $compile(template);
                 return function (scope, elem, attr) {
                     scope.popoover_show = "";
                     scope.title = attr['title'];
-                    scope.content = attr['content'];
+                    scope.content = $sce.trustAsHtml(attr['content']);
                     scope.placement = attr['placement'] ? attr['placement'] : 'top';
                     scope.trigger = attr['bravoPopoverConfirm'] ? 'click' : attr['trigger'];
 
