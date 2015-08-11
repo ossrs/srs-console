@@ -9,15 +9,17 @@ angular.module('bravoUiPopover', [])
             },
             compile: function (elem, attr) {
                 var confirm_template = attr['bravoPopoverConfirm'] ? '<div class="row-fluid">' +
-                        '<button class="span6 btn btn-danger" ng-click="on_confirm()">确定</button>' +
-                        '<button class="span6 btn btn-info" ng-click="on_cancel()">取消</button>' +
-                    '</div>' : '';
+                            '<button class="span6 btn btn-danger" ng-click="on_confirm()">确定</button>' +
+                            '<button class="span6 btn btn-info" ng-click="on_cancel()">取消</button>' +
+                        '</div>' : '';
                 var template =
                     '<div class="popover fade {{placement}} in" ng-show="popoover_show == \'in\'">' +
                         '<div class="arrow"></div>' +
                         '<h3 class="popover-title">{{title}}</h3>' +
                         '<div class="popover-content" ng-bind-html="content">' +
-                        confirm_template +
+                        '</div>' +
+                        '<div class="popover-content" ng-show="show_confirm_template">' +
+                             confirm_template +
                         '</div>' +
                     '</div>';
                 var linker = $compile(template);
@@ -27,6 +29,7 @@ angular.module('bravoUiPopover', [])
                     scope.content = $sce.trustAsHtml(attr['content']);
                     scope.placement = attr['placement'] ? attr['placement'] : 'top';
                     scope.trigger = attr['bravoPopoverConfirm'] ? 'click' : attr['trigger'];
+                    scope.show_confirm_template =  attr['bravoPopoverConfirm'] ? true : false;
 
                     var tooltip = linker(scope, function (o) {
                         elem.after(o);
