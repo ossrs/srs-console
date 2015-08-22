@@ -17,28 +17,19 @@
             <div class="container">
                 <a class="brand" href="javascript:void(0)">SRS</a>
                 <ul class="nav">
-                    <li><a href="https://github.com/simple-rtmp-server/srs">首页</a></li>
+                    <li class="{{'/console'| sc_filter_nav_active}}"><a href="#connect">连接SRS</a></li>
+                    <li class="{{'/summaries'| sc_filter_nav_active}}"><a href="#summaries">概览</a></li>
+                    <li class="{{'/vhosts'| sc_filter_nav_active}}"><a href="#summaries">虚拟主机(Vhosts)</a></li>
+                    <li class="{{'/streams'| sc_filter_nav_active}}"><a href="#summaries">视频流(Streams)</a></li>
+                    <li class="{{'/clients'| sc_filter_nav_active}}"><a href="#summaries">客户端(Clients)</a></li>
+                    <li><a href="https://github.com/simple-rtmp-server/srs">SRS</a></li>
                     <li><a href="http://ossrs.net/srs.release/releases/index.html">发行版</a></li>
                 </ul>
             </div>
         </div>
     </div>
     <div class="container">
-        <div class="row">
-            <div class="span3">
-                <ul class="nav nav-list bs-docs-sidenav">
-                    <li class="{{'/console'| sc_filter_nav_active}}"><a href="#connect"><i class="icon-chevron-right"></i>连接到SRS</a></li>
-                    <li class="{{'/summaries'| sc_filter_nav_active}}"><a href="#summaries"><i class="icon-chevron-right"></i>SRS信息概览</a></li>
-                    <li class="{{'/vhosts'| sc_filter_nav_active}}"><a href="#summaries"><i class="icon-chevron-right"></i>虚拟主机(Vhosts)管理</a></li>
-                    <li class="{{'/streams'| sc_filter_nav_active}}"><a href="#summaries"><i class="icon-chevron-right"></i>视频流(Streams)管理</a></li>
-                    <li class="{{'/clients'| sc_filter_nav_active}}"><a href="#summaries"><i class="icon-chevron-right"></i>客户端(Clients)管理</a></li>
-                </ul>
-            </div>
-            <div class="span9">
-                <div ng-view></div>
-            </div>
-        </div>
-        <hr/>
+        <div ng-view></div>
         <div bravo-alert ng-repeat="log in logs" class="alert fade in {{log.level|sc_filter_log_level}}">
             <button type="button" class="close" data-dismiss="alert">×</button>
             <strong>{{log.level}}:</strong> {{log.msg}}
