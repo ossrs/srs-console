@@ -298,9 +298,15 @@ scApp.filter("sc_filter_has_stream", function(){
     };
 });
 
-scApp.filter("sc_filter_achannel", function(){
+scApp.filter("sc_filter_video", function(){
     return function(v){
-        return v == 2? "Stereo":"Mono";
+        return v? v.codec + "/" + v.profile + "/" + v.level : "无视频";
+    };
+});
+
+scApp.filter("sc_filter_audio", function(){
+    return function(v){
+        return v? v.codec + "/" + v.sample_rate + "/" + (v.channel == 2? "Stereo":"Mono") + "/" + v.profile : "无音频";
     };
 });
 

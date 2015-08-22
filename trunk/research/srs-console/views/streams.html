@@ -28,8 +28,8 @@
                             <td>{{stream.clients}}人</td>
                             <td>{{stream.kbps.recv_30s| sc_filter_bitrate_k}}</td>
                             <td>{{stream.kbps.send_30s| sc_filter_bitrate_k}}</td>
-                            <td>{{stream.video.codec}}/{{stream.video.profile}}/{{stream.video.level}}</td>
-                            <td>{{stream.audio.codec}}/{{stream.audio.sample_rate}}/{{stream.audio.channel| sc_filter_achannel}}/{{stream.audio.profile}}</td>
+                            <td>{{stream.video| sc_filter_video}}</td>
+                            <td>{{stream.audio| sc_filter_audio}}</td>
                         </tr>
                     </table>
                 </div>
