@@ -14,7 +14,7 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "$sc_utility", 
     $interval(function(){
         for (var i = 0; i < $scope.logs.length; i++) {
             var log = $scope.logs[i];
-            if (log.create + 3000 < new Date().getTime()) {
+            if (log.create + 10000 < new Date().getTime()) {
                 $scope.logs.splice(i, 1);
                 break;
             }
@@ -57,14 +57,23 @@ scApp.controller("CSCConnect", ["$scope", "$location", "MSCApi", "$sc_utility", 
             $sc_nav.go_summary($location);
         });
     };
+
+    $sc_utility.refresh.stop();
 }]);
 scApp.controller("CSCSummary", ["$scope", "MSCApi", "$sc_utility", "$sc_nav", function($scope, MSCApi, $sc_utility, $sc_nav){
     $sc_nav.in_summary();
 
-    MSCApi.summaries_get(function(data){
-        $sc_utility.log("trace", "Retrieve summary from SRS ok.");
-        $scope.server = data.data.self;
-    });
+    $sc_utility.refresh.refresh_change(function(){
+        MSCApi.summaries_get(function(data){
+            $scope.server = data.data.self;
+            $scope.system = data.data.system;
+
+            $sc_utility.refresh.request();
+        });
+    }, 3000);
+
+    $sc_utility.log("trace", "Retrieve summary from SRS.");
+    $sc_utility.refresh.request(0);
 }]);
 
 scApp.filter("sc_filter_log_level", function(){
@@ -78,6 +87,74 @@ scApp.filter("sc_filter_nav_active", ["$sc_nav", function($sc_nav){
         return $sc_nav.is_selected(v)? "active":"";
     };
 }]);
+
+scApp.filter("sc_filter_filesize_k", function(){
+    return function(v){
+        // PB
+        if (v > 1024 * 1024 * 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024 / 1024 / 1024).toFixed(2) + "PB";
+        }
+        // TB
+        if (v > 1024 * 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024 / 1024).toFixed(2) + "TB";
+        }
+        // GB
+        if (v > 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024).toFixed(2) + "GB";
+        }
+        // MB
+        if (v > 1024 * 1024) {
+            return Number(v / 1024.0 / 1024).toFixed(2) + "MB";
+        }
+        return v + "KB";
+    };
+});
+
+scApp.filter("sc_filter_filerate_k", function(){
+    return function(v){
+        // PB
+        if (v > 1024 * 1024 * 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024 / 1024 / 1024).toFixed(2) + "PBps";
+        }
+        // TB
+        if (v > 1024 * 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024 / 1024).toFixed(2) + "TBps";
+        }
+        // GB
+        if (v > 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024).toFixed(2) + "GBps";
+        }
+        // MB
+        if (v > 1024 * 1024) {
+            return Number(v / 1024.0 / 1024).toFixed(2) + "MBps";
+        }
+        return v + "KBps";
+    };
+});
+
+scApp.filter("sc_filter_percent", function(){
+    return function(v){
+        return Number(v).toFixed(2) + "%";
+    };
+});
+
+scApp.filter("sc_filter_number", function(){
+    return function(v){
+        return Number(v).toFixed(2);
+    };
+});
+
+scApp.filter("sc_filter_time", function(){
+    return function(v){
+        var s = "";
+        if (v > 3600 * 24) {
+            s = Number(v / 3600 / 24).toFixed(0) + "天 ";
+            v = v % (3600 * 24);
+        }
+        s += relative_seconds_to_HHMMSS(v);
+        return s;
+    };
+});
 
 scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
     return {
@@ -141,7 +218,8 @@ scApp.provider("$sc_utility", function(){
             },
             http_error: function(status, response) {
                 $rootScope.$broadcast("$sc_utility_http_error", status, response);
-            }
+            },
+            refresh: async_refresh2
         };
     }];
 });
