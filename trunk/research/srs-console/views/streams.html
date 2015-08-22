@@ -19,6 +19,7 @@
                             <th>出口带宽</th>
                             <th>视频信息</th>
                             <th>音频信息</th>
+                            <th>管理</th>
                         </tr>
                         <tr ng-repeat="stream in streams">
                             <td><a href="#/streams/{{stream.id}}">{{stream.id}}</a></td>
@@ -30,6 +31,9 @@
                             <td>{{stream.kbps.send_30s| sc_filter_bitrate_k}}</td>
                             <td>{{stream.video| sc_filter_video}}</td>
                             <td>{{stream.audio| sc_filter_audio}}</td>
+                            <td>
+                                <a ng-show="stream.publish.active" ng-click="kickoff(stream)" href="javascript:void(0)">踢流</a>
+                            </td>
                         </tr>
                     </table>
                 </div>

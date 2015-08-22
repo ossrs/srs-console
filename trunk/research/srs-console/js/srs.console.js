@@ -116,6 +116,12 @@ scApp.controller("CSCVhost", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$s
 scApp.controller("CSCStreams", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_streams();
 
+    $scope.kickoff = function(stream) {
+        MSCApi.clients_delete(stream.publish.cid, function(){
+            $sc_utility.log("warn", "Kickoff stream ok.");
+        });
+    };
+
     $sc_utility.refresh.refresh_change(function(){
         MSCApi.streams_get(function(data){
             $scope.streams = data.streams;
@@ -130,6 +136,12 @@ scApp.controller("CSCStreams", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
 
 scApp.controller("CSCStream", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_streams();
+
+    $scope.kickoff = function(stream) {
+        MSCApi.clients_delete(stream.publish.cid, function(){
+            $sc_utility.log("warn", "Kickoff stream ok.");
+        });
+    };
 
     $sc_utility.refresh.refresh_change(function(){
         MSCApi.streams_get2($routeParams.id, function(data){
@@ -146,6 +158,12 @@ scApp.controller("CSCStream", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
 scApp.controller("CSCClients", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_clients();
 
+    $scope.kickoff = function(client) {
+        MSCApi.clients_delete(client.id, function(){
+            $sc_utility.log("warn", "Kickoff client ok.");
+        });
+    };
+
     $sc_utility.refresh.refresh_change(function(){
         MSCApi.clients_get(function(data){
             $scope.clients = data.clients;
@@ -160,6 +178,12 @@ scApp.controller("CSCClients", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
 
 scApp.controller("CSCClient", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_clients();
+
+    $scope.kickoff = function(client) {
+        MSCApi.clients_delete(client.id, function(){
+            $sc_utility.log("warn", "Kickoff client ok.");
+        });
+    };
 
     $sc_utility.refresh.refresh_change(function(){
         MSCApi.clients_get2($routeParams.id, function(data){
@@ -198,6 +222,9 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         },
         clients_get2: function(id, success) {
             $http.jsonp($sc_server.jsonp("/api/v1/clients/" + id)).success(success);
+        },
+        clients_delete: function(id, success) {
+            $http.jsonp($sc_server.jsonp_delete("/api/v1/clients/" + id)).success(success);
         }
     };
 }]);
@@ -376,6 +403,9 @@ scApp.provider("$sc_server", function(){
             },
             jsonp: function(url){
                 return this.baseurl() + url + "?callback=JSON_CALLBACK";
+            },
+            jsonp_delete: function(url) {
+                return this.jsonp(url) + "&method=DELETE";
             },
             init: function($location) {
                 this.host = $location.host();

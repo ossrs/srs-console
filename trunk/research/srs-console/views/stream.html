@@ -15,8 +15,9 @@
                     <p>Clients: {{stream.clients}}人</p>
                     <p>Recv: {{stream.kbps.recv_30s| sc_filter_bitrate_k}}</p>
                     <p>Send: {{stream.kbps.send_30s| sc_filter_bitrate_k}}</p>
-                    <p>Video: {{stream.video.codec}}/{{stream.video.profile}}/{{stream.video.level}}</p>
-                    <p>Audio: {{stream.audio.codec}}/{{stream.audio.sample_rate}}/{{stream.audio.channel| sc_filter_achannel}}/{{stream.audio.profile}}</p>
+                    <p>Video: {{stream.video| sc_filter_video}}</p>
+                    <p>Audio: {{stream.audio| sc_filter_audio}}</p>
+                    <p ng-show="stream.publish.active">管理: <a ng-click="kickoff(stream)" href="javascript:void(0)">踢流</a></p>
                 </div>
             </div>
         </div>
