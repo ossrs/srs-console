@@ -9,6 +9,8 @@ scApp.config(["$routeProvider", function($routeProvider){
         .when("/vhosts/:id", {templateUrl:"views/vhost.html", controller:"CSCVhost"})
         .when("/streams", {templateUrl:"views/streams.html", controller:"CSCStreams"})
         .when("/streams/:id", {templateUrl:"views/stream.html", controller:"CSCStream"})
+        .when("/clients", {templateUrl:"views/clients.html", controller:"CSCClients"})
+        .when("/clients/:id", {templateUrl:"views/client.html", controller:"CSCClient"})
         .when("/summaries", {templateUrl:"views/summary.html", controller:"CSCSummary"});
 }]);
 
@@ -141,6 +143,36 @@ scApp.controller("CSCStream", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
     $sc_utility.refresh.request(0);
 }]);
 
+scApp.controller("CSCClients", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
+    $sc_nav.in_clients();
+
+    $sc_utility.refresh.refresh_change(function(){
+        MSCApi.clients_get(function(data){
+            $scope.clients = data.clients;
+
+            $sc_utility.refresh.request();
+        });
+    }, 3000);
+
+    $sc_utility.log("trace", "Retrieve clients from SRS");
+    $sc_utility.refresh.request(0);
+}]);
+
+scApp.controller("CSCClient", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
+    $sc_nav.in_clients();
+
+    $sc_utility.refresh.refresh_change(function(){
+        MSCApi.clients_get2($routeParams.id, function(data){
+            $scope.client = data.client;
+
+            $sc_utility.refresh.request();
+        });
+    }, 3000);
+
+    $sc_utility.log("trace", "Retrieve client info from SRS");
+    $sc_utility.refresh.request(0);
+}]);
+
 scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
     return {
         versions_get: function(success) {
@@ -160,6 +192,12 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         },
         streams_get2: function(id, success) {
             $http.jsonp($sc_server.jsonp("/api/v1/streams/" + id)).success(success);
+        },
+        clients_get: function(success) {
+            $http.jsonp($sc_server.jsonp("/api/v1/clients")).success(success);
+        },
+        clients_get2: function(id, success) {
+            $http.jsonp($sc_server.jsonp("/api/v1/clients/" + id)).success(success);
         }
     };
 }]);
@@ -284,6 +322,12 @@ scApp.filter("sc_filter_time", function(){
     };
 });
 
+scApp.filter("sc_filter_ctype", function(){
+    return function(v){
+        return v? "推流":"播放";
+    };
+});
+
 // the sc nav is the nevigator
 scApp.provider("$sc_nav", function(){
     this.$get = function(){
@@ -300,6 +344,9 @@ scApp.provider("$sc_nav", function(){
             },
             in_streams: function(){
                 this.selected = "/streams";
+            },
+            in_clients: function(){
+                this.selected = "/clients";
             },
             go_summary: function($location){
                 $location.path("/summaries");

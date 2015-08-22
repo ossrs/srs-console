@@ -10,6 +10,7 @@
                 <div class="accordion-inner">
                     <p>ID: {{stream.id}}</p>
                     <p>Name: {{stream.name}}</p>
+                    <p>Vhost: <a href="#/vhosts/{{stream.vhost}}">{{stream.vhost}}</a></p>
                     <p>Publishing: {{stream.publish.active| sc_filter_has_stream}}</p>
                     <p>Clients: {{stream.clients}}人</p>
                     <p>Recv: {{stream.kbps.recv_30s| sc_filter_bitrate_k}}</p>
