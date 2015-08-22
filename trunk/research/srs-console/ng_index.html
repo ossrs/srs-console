@@ -2,28 +2,65 @@
 <html ng-app="scApp">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>SrsConsole</title>
+    <title>SRS控制台</title>
     <link rel="stylesheet" type="text/css" href="js/3rdparty/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="js/srs.console.css"/>
     <style>
         body {
-            padding-top: 0px;
+            padding-top: 50px;
         }
     </style>
 </head>
 <body ng-controller="CSCMain">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="brand" href="javascript:void(0)">SRS</a>
+                <ul class="nav">
+                    <li><a href="https://github.com/simple-rtmp-server/srs">首页</a></li>
+                    <li><a href="http://ossrs.net/srs.release/releases/index.html">发行版</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <div bravo-alert ng-repeat="log in logs" class="alert fade in {{log.level|sc_filter_log_level}}">
             <button type="button" class="close" data-dismiss="alert">×</button>
             <strong>{{log.level}}:</strong> {{log.msg}}
         </div>
-        <div ng-view></div>
-        <div id="footer">
-            <hr>
-            <footer>
-                <p>SrsTeam&copy; Company 2015</p>
-            </footer>
+        <div class="row">
+            <div class="span3">
+                <ul class="nav nav-list bs-docs-sidenav">
+                    <li><a href="#summaries"><i class="icon-chevron-right"></i>连接到SRS</a></li>
+                    <li class="active"><a href="#summaries"><i class="icon-chevron-right"></i>SRS信息概览</a></li>
+                    <li><a href="#summaries"><i class="icon-chevron-right"></i>虚拟主机(Vhosts)管理</a></li>
+                    <li><a href="#summaries"><i class="icon-chevron-right"></i>视频流(Streams)管理</a></li>
+                    <li><a href="#summaries"><i class="icon-chevron-right"></i>客户端(Clients)管理</a></li>
+                </ul>
+            </div>
+            <div class="span9" ng-view></div>
         </div>
     </div>
+    <footer class="footer">
+        <div class="container">
+            <p>SRS &copy; Team 2015</p>
+            <p>SRS is industrial-strength live streaming cluster</p>
+            <p>for the best conceptual integrity and the simplest implementation.</p>
+            <ul class="footer-links">
+                <li>
+                    <a href="http://blog.csdn.net/win_lin">Blog</a>
+                </li>
+                <li class="muted">.</li>
+                <li>
+                    <a href="https://github.com/simple-rtmp-server/srs/issues?q=is%3Aopen+is%3Aissue+milestone%3A%22srs+2.0+release%22">Issues</a>
+                </li>
+                <li class="muted">.</li>
+                <li>
+                    <a href="https://github.com/simple-rtmp-server/srs/releases">Changelog</a>
+                </li>
+            </ul>
+        </div>
+    </footer>
     <script type="text/javascript" src="js/3rdparty/angular.min.js"></script>
     <script type="text/javascript" src="js/3rdparty/angular-route.min.js"></script>
     <script type="text/javascript" src="js/3rdparty/angular-resource.min.js"></script>
