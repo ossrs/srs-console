@@ -11,15 +11,8 @@ scApp.config(["$routeProvider", function($routeProvider){
     $httpProvider.interceptors.push('MHttpInterceptor');
 }]);
 
-scApp.controller("CSCMain", ["$scope", "$interval", function($scope, $interval){
+scApp.controller("CSCMain", ["$scope", "$interval", "$sc_utility", function($scope, $interval, $sc_utility){
     $scope.logs = [];
-    $scope.$on("$sc_system_error", function(event, status, response){
-        // TODO: FIXME: parse the error.
-        var log = {
-            level:"warn", msg:response, create:new Date().getTime()
-        };
-        $scope.logs.push(log);
-    });
     // remove expired alert.
     $interval(function(){
         for (var i = 0; i < $scope.logs.length; i++) {
@@ -30,17 +23,31 @@ scApp.controller("CSCMain", ["$scope", "$interval", function($scope, $interval){
             }
         }
     }, 3000);
+    // handler system log event, from $sc_log service.
+    $scope.$on("$sc_utility_log", function(event, level, msg){
+        var log = {
+            level:level, msg:msg, create:new Date().getTime()
+        };
+        $scope.logs.push(log);
+    });
+
+    // handle system error event, from $sc_system_error service.
+    $scope.$on("$sc_utility_http_error", function(event, status, response){
+        // TODO: FIXME: parse the error.
+        $sc_utility.log("warn", response);
+    });
 }]);
 
-scApp.controller("CSCSummary", ["$scope", "MSCSummary", function($scope, MSCSummary){
+scApp.controller("CSCSummary", ["$scope", "MSCSummary", "$sc_utility", function($scope, MSCSummary, $sc_utility){
     MSCSummary.summaries_get(function(data){
+        $sc_utility.log("trace", "Retrieve summary from SRS ok.")
         $scope.server = data.data.self;
     });
 }]);
 
 scApp.filter("sc_filter_log_level", function(){
     return function(v) {
-        return v == "warn"? "alert-warn":"alert-success";
+        return (v == "warn" || v == "error")? "alert-warn":"alert-success";
     };
 });
 
@@ -50,14 +57,19 @@ scApp.factory("MSCSummary", ["$resource", function($resource){
     });
 }]);
 
-scApp.provider("$sc_system_error", function(){
-    this.$get = ["$window", "$rootScope", function($window, $rootScope){
-        return function(status, response) {
-            $rootScope.$broadcast("$sc_system_error", status, response);
+scApp.provider("$sc_utility", function(){
+    this.$get = ["$rootScope", function($rootScope){
+        return {
+            log: function(level, msg) {
+                $rootScope.$broadcast("$sc_utility_log", level, msg);
+            },
+            http_error: function(status, response) {
+                $rootScope.$broadcast("$sc_utility_http_error", status, response);
+            }
         };
     }];
 });
-scApp.factory('MHttpInterceptor', function($q, $sc_system_error){
+scApp.factory('MHttpInterceptor', ["$q", "$sc_utility", function($q, $sc_utility){
     // register the interceptor as a service
     // @see: https://code.angularjs.org/1.2.0-rc.3/docs/api/ng.$http
     // @remark: the function($q) should never add other params.
@@ -70,7 +82,7 @@ scApp.factory('MHttpInterceptor', function($q, $sc_system_error){
         },
         'response': function(response) {
             if (response.data.code && response.data.code != 0) {
-                $sc_system_error(response.status, response.data);
+                $sc_utility.http_error(response.status, response.data);
                 // the $q.reject, will cause the error function of controller.
                 // @see: https://code.angularjs.org/1.2.0-rc.3/docs/api/ng.$q
                 return $q.reject(response.data.code);
@@ -78,8 +90,8 @@ scApp.factory('MHttpInterceptor', function($q, $sc_system_error){
             return response || $q.when(response);
         },
         'responseError': function(rejection) {
-            code = $sc_system_error(rejection.status, rejection.data);
+            code = $sc_utility.http_error(rejection.status, rejection.data);
             return $q.reject(code);
         }
     };
-});
+}]);
