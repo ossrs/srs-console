@@ -5,6 +5,8 @@ var scApp = angular.module("scApp", ["ngRoute", "ngResource",
 scApp.config(["$routeProvider", function($routeProvider){
     $routeProvider.otherwise({redirectTo:"/connect"})
         .when("/connect", {templateUrl:"views/connect.html", controller:"CSCConnect"})
+        .when("/vhosts", {templateUrl:"views/vhosts.html", controller:"CSCVhosts"})
+        .when("/vhosts/:id", {templateUrl:"views/vhost.html", controller:"CSCVhost"})
         .when("/summaries", {templateUrl:"views/summary.html", controller:"CSCSummary"});
 }]);
 
@@ -60,6 +62,7 @@ scApp.controller("CSCConnect", ["$scope", "$location", "MSCApi", "$sc_utility", 
 
     $sc_utility.refresh.stop();
 }]);
+
 scApp.controller("CSCSummary", ["$scope", "MSCApi", "$sc_utility", "$sc_nav", function($scope, MSCApi, $sc_utility, $sc_nav){
     $sc_nav.in_summary();
 
@@ -74,6 +77,53 @@ scApp.controller("CSCSummary", ["$scope", "MSCApi", "$sc_utility", "$sc_nav", fu
 
     $sc_utility.log("trace", "Retrieve summary from SRS.");
     $sc_utility.refresh.request(0);
+}]);
+
+scApp.controller("CSCVhosts", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
+    $sc_nav.in_vhosts();
+
+    $sc_utility.refresh.refresh_change(function(){
+        MSCApi.vhosts_get(function(data){
+            $scope.vhosts = data.vhosts;
+
+            $sc_utility.refresh.request();
+        });
+    }, 3000);
+
+    $sc_utility.log("trace", "Retrieve vhosts from SRS");
+    $sc_utility.refresh.request(0);
+}]);
+
+scApp.controller("CSCVhost", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
+    $sc_nav.in_vhosts();
+
+    $sc_utility.refresh.refresh_change(function(){
+        MSCApi.vhosts_get2($routeParams.id, function(data){
+            $scope.vhost = data.vhost;
+
+            $sc_utility.refresh.request();
+        });
+    }, 3000);
+
+    $sc_utility.log("trace", "Retrieve vhost info from SRS");
+    $sc_utility.refresh.request(0);
+}]);
+
+scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
+    return {
+        versions_get: function(success) {
+            $http.jsonp($sc_server.jsonp("/api/v1/versions")).success(success);
+        },
+        summaries_get: function(success) {
+            $http.jsonp($sc_server.jsonp("/api/v1/summaries")).success(success);
+        },
+        vhosts_get: function(success) {
+            $http.jsonp($sc_server.jsonp("/api/v1/vhosts")).success(success);
+        },
+        vhosts_get2: function(id, success) {
+            $http.jsonp($sc_server.jsonp("/api/v1/vhosts/" + id)).success(success);
+        }
+    };
 }]);
 
 scApp.filter("sc_filter_log_level", function(){
@@ -132,9 +182,37 @@ scApp.filter("sc_filter_filerate_k", function(){
     };
 });
 
+scApp.filter("sc_filter_bitrate_k", function(){
+    return function(v){
+        // PB
+        if (v > 1000 * 1000 * 1000 * 1000 * 1000) {
+            return Number(v / 1000.0 / 1000 / 1000 / 1000 / 1000).toFixed(2) + "Pbps";
+        }
+        // TB
+        if (v > 1000 * 1000 * 1000 * 1000) {
+            return Number(v / 1000.0 / 1000 / 1000 / 1000).toFixed(2) + "Tbps";
+        }
+        // GB
+        if (v > 1000 * 1000 * 1000) {
+            return Number(v / 1000.0 / 1000 / 1000).toFixed(2) + "Gbps";
+        }
+        // MB
+        if (v > 1000 * 1000) {
+            return Number(v / 1000.0 / 1000).toFixed(2) + "Mbps";
+        }
+        return v + "Kbps";
+    };
+});
+
 scApp.filter("sc_filter_percent", function(){
     return function(v){
         return Number(v).toFixed(2) + "%";
+    };
+});
+
+scApp.filter("sc_filter_enabled", function(){
+    return function(v){
+        return v? "开启":"关闭";
     };
 });
 
@@ -156,17 +234,6 @@ scApp.filter("sc_filter_time", function(){
     };
 });
 
-scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
-    return {
-        versions_get: function(success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/versions")).success(success);
-        },
-        summaries_get: function(success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/summaries")).success(success);
-        }
-    };
-}]);
-
 // the sc nav is the nevigator
 scApp.provider("$sc_nav", function(){
     this.$get = function(){
@@ -177,6 +244,9 @@ scApp.provider("$sc_nav", function(){
             },
             in_summary: function(){
                 this.selected = "/summaries";
+            },
+            in_vhosts: function(){
+                this.selected = "/vhosts";
             },
             go_summary: function($location){
                 $location.path("/summaries");
