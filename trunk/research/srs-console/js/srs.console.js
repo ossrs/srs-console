@@ -7,6 +7,8 @@ scApp.config(["$routeProvider", function($routeProvider){
         .when("/connect", {templateUrl:"views/connect.html", controller:"CSCConnect"})
         .when("/vhosts", {templateUrl:"views/vhosts.html", controller:"CSCVhosts"})
         .when("/vhosts/:id", {templateUrl:"views/vhost.html", controller:"CSCVhost"})
+        .when("/streams", {templateUrl:"views/streams.html", controller:"CSCStreams"})
+        .when("/streams/:id", {templateUrl:"views/stream.html", controller:"CSCStream"})
         .when("/summaries", {templateUrl:"views/summary.html", controller:"CSCSummary"});
 }]);
 
@@ -109,6 +111,36 @@ scApp.controller("CSCVhost", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$s
     $sc_utility.refresh.request(0);
 }]);
 
+scApp.controller("CSCStreams", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
+    $sc_nav.in_streams();
+
+    $sc_utility.refresh.refresh_change(function(){
+        MSCApi.streams_get(function(data){
+            $scope.streams = data.streams;
+
+            $sc_utility.refresh.request();
+        });
+    }, 3000);
+
+    $sc_utility.log("trace", "Retrieve streams from SRS");
+    $sc_utility.refresh.request(0);
+}]);
+
+scApp.controller("CSCStream", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
+    $sc_nav.in_streams();
+
+    $sc_utility.refresh.refresh_change(function(){
+        MSCApi.streams_get2($routeParams.id, function(data){
+            $scope.stream = data.stream;
+
+            $sc_utility.refresh.request();
+        });
+    }, 3000);
+
+    $sc_utility.log("trace", "Retrieve stream info from SRS");
+    $sc_utility.refresh.request(0);
+}]);
+
 scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
     return {
         versions_get: function(success) {
@@ -122,6 +154,12 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         },
         vhosts_get2: function(id, success) {
             $http.jsonp($sc_server.jsonp("/api/v1/vhosts/" + id)).success(success);
+        },
+        streams_get: function(success) {
+            $http.jsonp($sc_server.jsonp("/api/v1/streams")).success(success);
+        },
+        streams_get2: function(id, success) {
+            $http.jsonp($sc_server.jsonp("/api/v1/streams/" + id)).success(success);
         }
     };
 }]);
@@ -216,6 +254,18 @@ scApp.filter("sc_filter_enabled", function(){
     };
 });
 
+scApp.filter("sc_filter_has_stream", function(){
+    return function(v){
+        return v? "有流":"无流";
+    };
+});
+
+scApp.filter("sc_filter_achannel", function(){
+    return function(v){
+        return v == 2? "Stereo":"Mono";
+    };
+});
+
 scApp.filter("sc_filter_number", function(){
     return function(v){
         return Number(v).toFixed(2);
@@ -247,6 +297,9 @@ scApp.provider("$sc_nav", function(){
             },
             in_vhosts: function(){
                 this.selected = "/vhosts";
+            },
+            in_streams: function(){
+                this.selected = "/streams";
             },
             go_summary: function($location){
                 $location.path("/summaries");
