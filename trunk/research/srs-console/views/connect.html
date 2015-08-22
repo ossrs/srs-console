@@ -1,0 +1,23 @@
+<div>
+    <h1>连接到您的SRS</h1>
+    <hr/>
+    <div class="form-horizontal">
+        <div class="control-group">
+            <label class="control-label" for="sscServer">服务器IP</label>
+            <div class="controls">
+                <input type="text" id="sscServer" placeholder="SRS API Server IP" ng-model="server.ip">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="sscPort">API端口</label>
+            <div class="controls">
+                <input type="text" id="sscPort" placeholder="SRS API Server Port" ng-model="server.port">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn" ng-click="connect()">连接到SRS</button>
+            </div>
+        </div>
+    </div>
+</div>

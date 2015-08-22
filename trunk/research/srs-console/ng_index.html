@@ -24,21 +24,24 @@
         </div>
     </div>
     <div class="container">
-        <div bravo-alert ng-repeat="log in logs" class="alert fade in {{log.level|sc_filter_log_level}}">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <strong>{{log.level}}:</strong> {{log.msg}}
-        </div>
         <div class="row">
             <div class="span3">
                 <ul class="nav nav-list bs-docs-sidenav">
-                    <li><a href="#summaries"><i class="icon-chevron-right"></i>连接到SRS</a></li>
-                    <li class="active"><a href="#summaries"><i class="icon-chevron-right"></i>SRS信息概览</a></li>
-                    <li><a href="#summaries"><i class="icon-chevron-right"></i>虚拟主机(Vhosts)管理</a></li>
-                    <li><a href="#summaries"><i class="icon-chevron-right"></i>视频流(Streams)管理</a></li>
-                    <li><a href="#summaries"><i class="icon-chevron-right"></i>客户端(Clients)管理</a></li>
+                    <li class="{{'/console'| sc_filter_nav_active}}"><a href="#connect"><i class="icon-chevron-right"></i>连接到SRS</a></li>
+                    <li class="{{'/summaries'| sc_filter_nav_active}}"><a href="#summaries"><i class="icon-chevron-right"></i>SRS信息概览</a></li>
+                    <li class="{{'/vhosts'| sc_filter_nav_active}}"><a href="#summaries"><i class="icon-chevron-right"></i>虚拟主机(Vhosts)管理</a></li>
+                    <li class="{{'/streams'| sc_filter_nav_active}}"><a href="#summaries"><i class="icon-chevron-right"></i>视频流(Streams)管理</a></li>
+                    <li class="{{'/clients'| sc_filter_nav_active}}"><a href="#summaries"><i class="icon-chevron-right"></i>客户端(Clients)管理</a></li>
                 </ul>
             </div>
-            <div class="span9" ng-view></div>
+            <div class="span9">
+                <div ng-view></div>
+            </div>
+        </div>
+        <hr/>
+        <div bravo-alert ng-repeat="log in logs" class="alert fade in {{log.level|sc_filter_log_level}}">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong>{{log.level}}:</strong> {{log.msg}}
         </div>
     </div>
     <footer class="footer">
@@ -61,9 +64,9 @@
             </ul>
         </div>
     </footer>
-    <script type="text/javascript" src="js/3rdparty/angular.min.js"></script>
-    <script type="text/javascript" src="js/3rdparty/angular-route.min.js"></script>
-    <script type="text/javascript" src="js/3rdparty/angular-resource.min.js"></script>
+    <script type="text/javascript" src="js/3rdparty/angular.js"></script>
+    <script type="text/javascript" src="js/3rdparty/angular-route.js"></script>
+    <script type="text/javascript" src="js/3rdparty/angular-resource.js"></script>
     <script type="text/javascript" src="js/bravo_alert/alert.js"></script>
     <script type="text/javascript" src="js/bravo_popover/popover.js"></script>
     <script type="text/javascript" src="js/srs.console.js"></script>
