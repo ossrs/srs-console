@@ -11,6 +11,7 @@ scApp.config(["$routeProvider", function($routeProvider){
         .when("/streams/:id", {templateUrl:"views/stream.html", controller:"CSCStream"})
         .when("/clients", {templateUrl:"views/clients.html", controller:"CSCClients"})
         .when("/clients/:id", {templateUrl:"views/client.html", controller:"CSCClient"})
+        .when("/configs", {templateUrl:"views/configs.html", controller:"CSCConfigs"})
         .when("/summaries", {templateUrl:"views/summary.html", controller:"CSCSummary"});
 }]);
 
@@ -197,6 +198,26 @@ scApp.controller("CSCClient", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
     $sc_utility.refresh.request(0);
 }]);
 
+scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
+    $sc_nav.in_configs();
+
+    $sc_utility.refresh.refresh_change(function(){
+        MSCApi.configs_get(function(data){
+            var global = data.global;
+            for (var key in global.vhosts) {
+                var vhost = global.vhosts[key];
+                vhost.name = key;
+            }
+            $scope.global = global;
+
+            $sc_utility.refresh.request();
+        });
+    }, 3000);
+
+    $sc_utility.log("trace", "Retrieve config info from SRS");
+    $sc_utility.refresh.request(0);
+}]);
+
 scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
     return {
         versions_get: function(success) {
@@ -225,6 +246,9 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         },
         clients_delete: function(id, success) {
             $http.jsonp($sc_server.jsonp_delete("/api/v1/clients/" + id)).success(success);
+        },
+        configs_get: function(success) {
+            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=config_query&scope=global")).success(success);
         }
     };
 }]);
@@ -319,6 +343,18 @@ scApp.filter("sc_filter_enabled", function(){
     };
 });
 
+scApp.filter("sc_filter_yesno", function(){
+    return function(v){
+        return v? "是":"否";
+    };
+});
+
+scApp.filter("sc_filter_yn", function(){
+    return function(v){
+        return v? "Y":"N";
+    };
+});
+
 scApp.filter("sc_filter_has_stream", function(){
     return function(v){
         return v? "有流":"无流";
@@ -381,6 +417,9 @@ scApp.provider("$sc_nav", function(){
             in_clients: function(){
                 this.selected = "/clients";
             },
+            in_configs: function(){
+                this.selected = "/configs";
+            },
             go_summary: function($location){
                 $location.path("/summaries");
             },
@@ -406,6 +445,9 @@ scApp.provider("$sc_server", function(){
             },
             jsonp_delete: function(url) {
                 return this.jsonp(url) + "&method=DELETE";
+            },
+            jsonp_query: function(url, query){
+                return this.baseurl() + url + "?callback=JSON_CALLBACK&" + query;
             },
             init: function($location) {
                 this.host = $location.host();
