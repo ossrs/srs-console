@@ -218,7 +218,7 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
     MSCApi.configs_raw(function(data){
         $scope.http_api = data.http_api;
 
-        if (!data.http_api.enabled || !data.http_api.raw_api || !data.http_api.raw_api.enabled) {
+        if (!data.http_api || !data.http_api.enabled || !data.http_api.raw_api || !data.http_api.raw_api.enabled) {
             return;
         }
 
