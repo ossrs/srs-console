@@ -186,12 +186,19 @@ function parse_query_string(){
         }
     }
 
+    // split again for angularjs.
+    if (query_string.indexOf("?") > 0) {
+        query_string = query_string.split("?")[1];
+    }
+
     var queries = query_string.split("&");
-    $(queries).each(function(){
-        var query = this.split("=");
+    for (var i = 0; i < queries.length; i++) {
+        var elem = queries[i];
+
+        var query = elem.split("=");
         obj[query[0]] = query[1];
         obj.user_query[query[0]] = query[1];
-    });
+    }
 
     return obj;
 }

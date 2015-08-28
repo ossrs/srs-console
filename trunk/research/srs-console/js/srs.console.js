@@ -45,6 +45,19 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
         $sc_utility.log("warn", response);
     });
 
+    // handle location events.
+    $scope.$on("$locationChangeStart", function(){
+        // we store the config in the query string url.
+        // always set the host and port in query.
+        if (!$location.search().host && $sc_server.host) {
+            $location.search("host", $sc_server.host);
+        }
+
+        if (!$location.search().port && $sc_server.port) {
+            $location.search("port", $sc_server.port);
+        }
+    });
+
     $sc_server.init($location);
     //$sc_utility.log("trace", "set baseurl to " + $sc_server.baseurl());
 }]);
@@ -464,8 +477,18 @@ scApp.provider("$sc_server", function(){
                 return this.baseurl() + url + "?callback=JSON_CALLBACK&" + query;
             },
             init: function($location) {
-                this.host = $location.host();
-                this.port = $location.port();
+                // query string then url.
+                if ($location.search().host) {
+                    this.host = $location.search().host;
+                } else {
+                    this.host = $location.host();
+                }
+
+                if ($location.search().port) {
+                    this.port = $location.search().port;
+                } else {
+                    this.port = $location.port();
+                }
             }
         };
     };
