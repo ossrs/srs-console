@@ -15,7 +15,7 @@ scApp.config(["$routeProvider", function($routeProvider){
         .when("/summaries", {templateUrl:"views/summary.html", controller:"CSCSummary"});
 }]);
 
-scApp.controller("CSCMain", ["$scope", "$interval", "$location", "$sc_utility", "$sc_server", function($scope, $interval, $location, $sc_utility, $sc_server){
+scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_utility", "$sc_server", function($scope, $interval, $location, MSCApi, $sc_utility, $sc_server){
     $scope.logs = [];
     // remove expired alert.
     $interval(function(){
@@ -47,6 +47,19 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "$sc_utility", 
 
     $sc_server.init($location);
     //$sc_utility.log("trace", "set baseurl to " + $sc_server.baseurl());
+
+    // request HTTP RAW API
+    $scope.update_raw_available = function(success) {
+        // update the available for new server.
+        MSCApi.configs_raw(function(data){
+            $scope.support_raw = data && data.http_api && data.http_api.raw_api && data.http_api.raw_api.enabled;
+
+            if (success) {
+                success();
+            }
+        });
+    };
+    $scope.update_raw_available(null);
 }]);
 
 scApp.controller("CSCConnect", ["$scope", "$location", "MSCApi", "$sc_utility", "$sc_nav", "$sc_server", function($scope, $location, MSCApi, $sc_utility, $sc_nav, $sc_server){
@@ -59,9 +72,11 @@ scApp.controller("CSCConnect", ["$scope", "$location", "MSCApi", "$sc_utility", 
         $sc_server.host = $scope.server.ip;
         $sc_server.port = $scope.server.port;
 
-        MSCApi.versions_get(function(data){
-            $sc_utility.log("trace", "连接到SRS" + $scope.server.ip + "成功, SRS/" + data.data.version);
-            $sc_nav.go_summary($location);
+        $scope.update_raw_available(function(){
+            MSCApi.versions_get(function(data){
+                $sc_utility.log("trace", "连接到SRS" + $scope.server.ip + "成功, SRS/" + data.data.version);
+                $sc_nav.go_summary($location);
+            });
         });
     };
 
@@ -201,21 +216,26 @@ scApp.controller("CSCClient", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
 scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_configs();
 
-    $sc_utility.refresh.refresh_change(function(){
-        MSCApi.configs_get(function(data){
-            var global = data.global;
-            for (var key in global.vhosts) {
-                var vhost = global.vhosts[key];
-                vhost.name = key;
-            }
-            $scope.global = global;
+    MSCApi.configs_raw(function(data){
+        $scope.http_api = data.http_api;
 
-            $sc_utility.refresh.request();
-        });
-    }, 3000);
+        $sc_utility.refresh.refresh_change(function(){
+            MSCApi.configs_get(function(data){
+                var global = data.global;
+                for (var key in global.vhosts) {
+                    var vhost = global.vhosts[key];
+                    vhost.name = key;
+                }
+                $scope.global = global;
+
+                $sc_utility.refresh.request();
+            });
+        }, 3000);
+
+        $sc_utility.refresh.request(0);
+    });
 
     $sc_utility.log("trace", "Retrieve config info from SRS");
-    $sc_utility.refresh.request(0);
 }]);
 
 scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
@@ -246,6 +266,9 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         },
         clients_delete: function(id, success) {
             $http.jsonp($sc_server.jsonp_delete("/api/v1/clients/" + id)).success(success);
+        },
+        configs_raw: function(success) {
+            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=raw")).success(success);
         },
         configs_get: function(success) {
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=config_query&scope=global")).success(success);
@@ -467,10 +490,45 @@ scApp.provider("$sc_utility", function(){
             http_error: function(status, response) {
                 $rootScope.$broadcast("$sc_utility_http_error", status, response);
             },
+            find_siblings: function(elem, className) {
+                if (elem.hasClass(className)) {
+                    return elem;
+                }
+
+                if (!elem[0].nextSibling) {
+                    return null;
+                }
+
+                var sibling = angular.element(elem[0].nextSibling);
+                return this.find_siblings(sibling, className);
+            },
             refresh: async_refresh2
         };
     }];
 });
+// sc-switch: scSwitch
+// sc-siwtch-in: scSwitchIn, to show the collapse.
+scApp.directive('scSwitch', ["$sc_utility", function($sc_utility){
+    return {
+        restrict: 'A',
+        scope: true,
+        controller: function($scope) {
+        },
+        compile: function(elem, attrs) {
+            return function(scope, elem, attrs){
+                if (attrs.scSwitch == "in") {
+                    var obj = $sc_utility.find_siblings(elem, 'accordion-body');
+                    obj.addClass('in');
+                }
+
+                elem.on('click', function(){
+                    var obj = $sc_utility.find_siblings(elem, 'accordion-body');
+                    obj.toggleClass('in');
+                });
+            };
+        }
+    };
+}]);
 
 // config the http interceptor.
 scApp.config(['$httpProvider', function($httpProvider){
