@@ -291,20 +291,20 @@ scApp.filter("sc_filter_nav_active", ["$sc_nav", function($sc_nav){
 scApp.filter("sc_filter_filesize_k", function(){
     return function(v){
         // PB
-        if (v > 1024 * 1024 * 1024 * 1024 * 1024) {
-            return Number(v / 1024.0 / 1024 / 1024 / 1024 / 1024).toFixed(2) + "PB";
+        if (v > 1024 * 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024 / 1024).toFixed(2) + "PB";
         }
         // TB
-        if (v > 1024 * 1024 * 1024 * 1024) {
-            return Number(v / 1024.0 / 1024 / 1024 / 1024).toFixed(2) + "TB";
+        if (v > 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024).toFixed(2) + "TB";
         }
         // GB
-        if (v > 1024 * 1024 * 1024) {
-            return Number(v / 1024.0 / 1024 / 1024).toFixed(2) + "GB";
+        if (v > 1024 * 1024) {
+            return Number(v / 1024.0 / 1024).toFixed(2) + "GB";
         }
         // MB
-        if (v > 1024 * 1024) {
-            return Number(v / 1024.0 / 1024).toFixed(2) + "MB";
+        if (v > 1024) {
+            return Number(v / 1024.0).toFixed(2) + "MB";
         }
         return v + "KB";
     };
@@ -313,20 +313,20 @@ scApp.filter("sc_filter_filesize_k", function(){
 scApp.filter("sc_filter_filerate_k", function(){
     return function(v){
         // PB
-        if (v > 1024 * 1024 * 1024 * 1024 * 1024) {
-            return Number(v / 1024.0 / 1024 / 1024 / 1024 / 1024).toFixed(2) + "PBps";
+        if (v > 1024 * 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024 / 1024).toFixed(2) + "PBps";
         }
         // TB
-        if (v > 1024 * 1024 * 1024 * 1024) {
-            return Number(v / 1024.0 / 1024 / 1024 / 1024).toFixed(2) + "TBps";
+        if (v > 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024).toFixed(2) + "TBps";
         }
         // GB
-        if (v > 1024 * 1024 * 1024) {
-            return Number(v / 1024.0 / 1024 / 1024).toFixed(2) + "GBps";
+        if (v > 1024 * 1024) {
+            return Number(v / 1024.0 / 1024).toFixed(2) + "GBps";
         }
         // MB
-        if (v > 1024 * 1024) {
-            return Number(v / 1024.0 / 1024).toFixed(2) + "MBps";
+        if (v > 1024) {
+            return Number(v / 1024.0).toFixed(2) + "MBps";
         }
         return v + "KBps";
     };
@@ -335,20 +335,20 @@ scApp.filter("sc_filter_filerate_k", function(){
 scApp.filter("sc_filter_bitrate_k", function(){
     return function(v){
         // PB
-        if (v > 1000 * 1000 * 1000 * 1000 * 1000) {
-            return Number(v / 1000.0 / 1000 / 1000 / 1000 / 1000).toFixed(2) + "Pbps";
+        if (v > 1000 * 1000 * 1000 * 1000) {
+            return Number(v / 1000.0 / 1000 / 1000 / 1000).toFixed(2) + "Pbps";
         }
         // TB
-        if (v > 1000 * 1000 * 1000 * 1000) {
-            return Number(v / 1000.0 / 1000 / 1000 / 1000).toFixed(2) + "Tbps";
+        if (v > 1000 * 1000 * 1000) {
+            return Number(v / 1000.0 / 1000 / 1000).toFixed(2) + "Tbps";
         }
         // GB
-        if (v > 1000 * 1000 * 1000) {
-            return Number(v / 1000.0 / 1000 / 1000).toFixed(2) + "Gbps";
+        if (v > 1000 * 1000) {
+            return Number(v / 1000.0 / 1000).toFixed(2) + "Gbps";
         }
         // MB
-        if (v > 1000 * 1000) {
-            return Number(v / 1000.0 / 1000).toFixed(2) + "Mbps";
+        if (v > 1000) {
+            return Number(v / 1000.0).toFixed(2) + "Mbps";
         }
         return v + "Kbps";
     };
