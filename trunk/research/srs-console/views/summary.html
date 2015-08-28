@@ -10,7 +10,7 @@
                 <div class="accordion-inner">
                     <p>Server/{{server.version}}</p>
                     <p>运行: {{server.srs_uptime| sc_filter_time}}</p>
-                    <p>内存: {{server.mem_kbyte| sc_filter_filesize_k}} ({{server.mem_percent| sc_filter_percent}})</p>
+                    <p>内存: {{server.mem_kbyte| sc_filter_filesize_k}}/{{system.mem_ram_kbyte| sc_filter_filesize_k}} ({{server.mem_percent| sc_filter_percent}})</p>
                     <p>CPU: {{server.cpu_percent| sc_filter_percent}} ({{system.cpus_online * 100| sc_filter_percent}})</p>
                     <p>负载: {{system.load_1m| sc_filter_number}} {{system.load_5m| sc_filter_number}} {{system.load_15m| sc_filter_number}}</p>
                     <p>IO: {{system.disk_busy_percent| sc_filter_percent}} 读({{system.disk_read_KBps| sc_filter_filerate_k}}) 写({{system.disk_write_KBps| sc_filter_filerate_k}})</p>
