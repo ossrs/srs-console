@@ -1,7 +1,7 @@
 <div>
     <div class="accordion">
         <div class="accordion-group">
-            <div class="accordion-heading" sc-switch>
+            <div class="accordion-heading" sc-collapse>
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器全局配置
                 </a>
@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="global.heartbeat">
-            <div class="accordion-heading" sc-switch>
+            <div class="accordion-heading" sc-collapse>
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器心跳(Heartbeat)
                 </a>
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="global.stats">
-            <div class="accordion-heading" sc-switch>
+            <div class="accordion-heading" sc-collapse>
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器统计(stats)
                 </a>
@@ -53,7 +53,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="global.http_api">
-            <div class="accordion-heading" sc-switch="in">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器API配置
                 </a>
@@ -65,7 +65,7 @@
                     <p ng-show="global.http_api.crossdomain != undefined">CROS: {{global.http_api.crossdomain| sc_filter_enabled}}</p>
                     <p ng-show="http_api.raw_api.enabled != undefined">RAW API: {{http_api.raw_api.enabled| sc_filter_enabled}}</p>
                     <p ng-show="http_api.raw_api.allow_reload != undefined">允许Reload: {{http_api.raw_api.allow_reload| sc_filter_enabled}}</p>
-                    <p ng-show="http_api.raw_api.allow_config_query != undefined">允许ConfigQuery: {{http_api.raw_api.allow_config_query| sc_filter_enabled}}</p>
+                    <p ng-show="http_api.raw_api.allow_query != undefined">允许Query: {{http_api.raw_api.allow_query| sc_filter_enabled}}</p>
                 </div>
             </div>
         </div>
@@ -84,7 +84,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="global.stream_caster">
-            <div class="accordion-heading" sc-switch>
+            <div class="accordion-heading" sc-collapse>
                 <a class="accordion-toggle" href="javascript:void(0)">
                     StreamCaster流转换器
                 </a>
@@ -100,7 +100,7 @@
             </div>
         </div>
         <div class="accordion-group">
-            <div class="accordion-heading" sc-switch="in">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     虚拟主机(Vhosts)列表
                 </a>

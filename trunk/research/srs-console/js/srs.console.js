@@ -271,7 +271,7 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=raw")).success(success);
         },
         configs_get: function(success) {
-            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=config_query&scope=global")).success(success);
+            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=global")).success(success);
         }
     };
 }]);
@@ -506,9 +506,8 @@ scApp.provider("$sc_utility", function(){
         };
     }];
 });
-// sc-switch: scSwitch
-// sc-siwtch-in: scSwitchIn, to show the collapse.
-scApp.directive('scSwitch', ["$sc_utility", function($sc_utility){
+// sc-collapse: scCollapse
+scApp.directive('scCollapse', ["$sc_utility", function($sc_utility){
     return {
         restrict: 'A',
         scope: true,
@@ -516,7 +515,7 @@ scApp.directive('scSwitch', ["$sc_utility", function($sc_utility){
         },
         compile: function(elem, attrs) {
             return function(scope, elem, attrs){
-                if (attrs.scSwitch == "in") {
+                if (attrs.scCollapse == "in") {
                     var obj = $sc_utility.find_siblings(elem, 'accordion-body');
                     obj.addClass('in');
                 }
