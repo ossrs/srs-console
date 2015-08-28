@@ -47,19 +47,6 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
 
     $sc_server.init($location);
     //$sc_utility.log("trace", "set baseurl to " + $sc_server.baseurl());
-
-    // request HTTP RAW API
-    $scope.update_raw_available = function(success) {
-        // update the available for new server.
-        MSCApi.configs_raw(function(data){
-            $scope.support_raw = data && data.http_api && data.http_api.raw_api && data.http_api.raw_api.enabled;
-
-            if (success) {
-                success();
-            }
-        });
-    };
-    $scope.update_raw_available(null);
 }]);
 
 scApp.controller("CSCConnect", ["$scope", "$location", "MSCApi", "$sc_utility", "$sc_nav", "$sc_server", function($scope, $location, MSCApi, $sc_utility, $sc_nav, $sc_server){
@@ -72,11 +59,9 @@ scApp.controller("CSCConnect", ["$scope", "$location", "MSCApi", "$sc_utility", 
         $sc_server.host = $scope.server.ip;
         $sc_server.port = $scope.server.port;
 
-        $scope.update_raw_available(function(){
-            MSCApi.versions_get(function(data){
-                $sc_utility.log("trace", "连接到SRS" + $scope.server.ip + "成功, SRS/" + data.data.version);
-                $sc_nav.go_summary($location);
-            });
+        MSCApi.versions_get(function(data){
+            $sc_utility.log("trace", "连接到SRS" + $scope.server.ip + "成功, SRS/" + data.data.version);
+            $sc_nav.go_summary($location);
         });
     };
 
@@ -216,8 +201,13 @@ scApp.controller("CSCClient", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
 scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_configs();
 
+    $scope.support_raw_api = false;
     MSCApi.configs_raw(function(data){
         $scope.http_api = data.http_api;
+
+        if (!data.http_api.enabled || !data.http_api.raw_api || !data.http_api.raw_api.enabled) {
+            return;
+        }
 
         $sc_utility.refresh.refresh_change(function(){
             MSCApi.configs_get(function(data){
@@ -227,6 +217,7 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
                     vhost.name = key;
                 }
                 $scope.global = global;
+                $scope.support_raw_api = true;
 
                 $sc_utility.refresh.request();
             });
