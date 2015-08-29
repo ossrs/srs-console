@@ -100,7 +100,7 @@
                     <table class="table table-striped table-hover table-bordered">
                         <tr>
                             <th>Key</th>
-                            <th>value</th>
+                            <th>Value</th>
                             <th>Description</th>
                         </tr>
                         <tr ng-show="http_api.enabled != undefined">
@@ -322,6 +322,7 @@
                             <th ng-show="false">ATC</th>
                             <th>转码</th>
                             <th>采集</th>
+                            <th>Opt</th>
                         </tr>
                         <tr ng-repeat="vhost in global.vhosts">
                             <td><a href="#/vhosts/{{vhost.id}}" ng-show="vhost.id">{{vhost.id}}</a><span ng-show="!vhost.id">无流</span> </td>
@@ -347,6 +348,7 @@
                             <td ng-show="false">{{vhost.atc| sc_filter_yn}}</td>
                             <td>{{vhost.transcode| sc_filter_yn}}</td>
                             <td>{{vhost.ingest| sc_filter_yn}}</td>
+                            <td><a href="#/configs/{{vhost.name}}" class="icon-wrench"></a></td>
                         </tr>
                     </table>
                 </div>

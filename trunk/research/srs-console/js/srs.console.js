@@ -12,6 +12,7 @@ scApp.config(["$routeProvider", function($routeProvider){
         .when("/clients", {templateUrl:"views/clients.html", controller:"CSCClients"})
         .when("/clients/:id", {templateUrl:"views/client.html", controller:"CSCClient"})
         .when("/configs", {templateUrl:"views/configs.html", controller:"CSCConfigs"})
+        .when("/configs/:id", {templateUrl:"views/config.html", controller:"CSCConfig"})
         .when("/summaries", {templateUrl:"views/summary.html", controller:"CSCSummary"});
 }]);
 
@@ -115,16 +116,13 @@ scApp.controller("CSCVhosts", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fun
 scApp.controller("CSCVhost", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_vhosts();
 
-    $sc_utility.refresh.refresh_change(function(){
-        MSCApi.vhosts_get2($routeParams.id, function(data){
-            $scope.vhost = data.vhost;
+    $sc_utility.refresh.stop();
 
-            $sc_utility.refresh.request();
-        });
-    }, 3000);
+    MSCApi.vhosts_get2($routeParams.id, function(data){
+        $scope.vhost = data.vhost;
+    });
 
     $sc_utility.log("trace", "Retrieve vhost info from SRS");
-    $sc_utility.refresh.request(0);
 }]);
 
 scApp.controller("CSCStreams", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
@@ -157,16 +155,13 @@ scApp.controller("CSCStream", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
         });
     };
 
-    $sc_utility.refresh.refresh_change(function(){
-        MSCApi.streams_get2($routeParams.id, function(data){
-            $scope.stream = data.stream;
+    $sc_utility.refresh.stop();
 
-            $sc_utility.refresh.request();
-        });
-    }, 3000);
+    MSCApi.streams_get2($routeParams.id, function(data){
+        $scope.stream = data.stream;
+    });
 
     $sc_utility.log("trace", "Retrieve stream info from SRS");
-    $sc_utility.refresh.request(0);
 }]);
 
 scApp.controller("CSCClients", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
@@ -199,20 +194,19 @@ scApp.controller("CSCClient", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
         });
     };
 
-    $sc_utility.refresh.refresh_change(function(){
-        MSCApi.clients_get2($routeParams.id, function(data){
-            $scope.client = data.client;
+    $sc_utility.refresh.stop();
 
-            $sc_utility.refresh.request();
-        });
-    }, 3000);
+    MSCApi.clients_get2($routeParams.id, function(data){
+        $scope.client = data.client;
+    });
 
     $sc_utility.log("trace", "Retrieve client info from SRS");
-    $sc_utility.refresh.request(0);
 }]);
 
 scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_configs();
+
+    $sc_utility.refresh.stop();
 
     $scope.support_raw_api = false;
     MSCApi.configs_raw(function(data){
@@ -240,6 +234,18 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
     });
 
     $sc_utility.log("trace", "Retrieve config info from SRS");
+}]);
+
+scApp.controller("CSCConfig", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
+    $sc_nav.in_configs();
+
+    $sc_utility.refresh.stop();
+
+    MSCApi.configs_get2($routeParams.id, function(data){
+        $scope.vhost = data.vhost;
+    });
+
+    $sc_utility.log("trace", "Retrieve vhost config info from SRS");
 }]);
 
 scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
@@ -276,6 +282,9 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         },
         configs_get: function(success) {
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=global")).success(success);
+        },
+        configs_get2: function(id, success) {
+            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=vhost&vhost=" + id)).success(success);
         }
     };
 }]);
@@ -390,7 +399,11 @@ scApp.filter("sc_filter_has_stream", function(){
 
 scApp.filter("sc_filter_video", function(){
     return function(v){
-        return v? v.codec + "/" + v.profile + "/" + v.level : "无视频";
+        // set default value for SRS2.
+        v.width = v.width? v.width : 0;
+        v.height = v.height? v.height : 0;
+
+        return v? v.codec + "/" + v.profile + "/" + v.level + "/" + v.width + "x" + v.height : "无视频";
     };
 });
 
@@ -520,6 +533,7 @@ scApp.provider("$sc_utility", function(){
         };
     }];
 });
+
 // sc-collapse: scCollapse
 scApp.directive('scCollapse', ["$sc_utility", function($sc_utility){
     return {
