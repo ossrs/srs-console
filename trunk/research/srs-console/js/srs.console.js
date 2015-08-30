@@ -437,6 +437,15 @@ scApp.filter("sc_filter_ctype", function(){
     };
 });
 
+scApp.filter("sc_filter_security", function(){
+    return function(v) {
+        var action = v.action == "allow"? "允许":"禁止";
+        var method = v.method == "all"? "任何操作": (v.method == "publish"? "推流":"播放");
+        var entry = v.entry == "all"? "所有人" : v.entry;
+        return action + " " + entry + " " + method;
+    }
+});
+
 // the sc nav is the nevigator
 scApp.provider("$sc_nav", function(){
     this.$get = function(){
