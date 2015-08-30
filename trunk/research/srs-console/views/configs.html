@@ -11,6 +11,56 @@
                     <div class="alert alert-block alert-danger">
                         该服务器不支持HTTP RAW API，或者配置中禁用了该功能。
                     </div>
+                    <table class="table table-striped table-hover table-bordered" ng-show="http_api">
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                            <th>Opt</th>
+                        </tr>
+                        <tr>
+                            <td>http_api.enabled</td>
+                            <td sc-pretty="http_api.enabled" scp-bool="true"></td>
+                            <td>是否开启HTTP API，开启后就可以访问SRS提供的API管理服务器。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
+                        </tr>
+                        <tr>
+                            <td>http_api.listen</td>
+                            <td sc-pretty="http_api.listen"></td>
+                            <td>HTTP API的侦听地址，格式是&lt;[address:]port&gt;。默认: 1985</td>
+                            <td>修改</td>
+                        </tr>
+                        <tr>
+                            <td>http_api.crossdomain</td>
+                            <td sc-pretty="http_api.crossdomain" scp-bool="true"></td>
+                            <td>是否允许JS跨域，开启后JS可以直接跨域(还可以通过JSONP访问)。默认: {{true| sc_filter_enabled}}</td>
+                            <td>修改</td>
+                        </tr>
+                        <tr>
+                            <td>http_api.raw_api.enabled</td>
+                            <td sc-pretty="http_api.raw_api.enabled" scp-bool="true"></td>
+                            <td>是否开启HTTP RAW API，允许API修改服务器配置。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
+                        </tr>
+                        <tr>
+                            <td>http_api.raw_api.allow_reload</td>
+                            <td sc-pretty="http_api.raw_api.allow_reload" scp-bool="true"></td>
+                            <td>是否允许API进行Reload操作。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
+                        </tr>
+                        <tr>
+                            <td>http_api.raw_api.allow_query</td>
+                            <td sc-pretty="http_api.raw_api.allow_query" scp-bool="true"></td>
+                            <td>是否允许API进行Query查询操作。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
+                        </tr>
+                        <tr>
+                            <td>http_api.raw_api.allow_update</td>
+                            <td sc-pretty="http_api.raw_api.allow_update" scp-bool="true"></td>
+                            <td>是否允许API进行Update更新操作。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
@@ -92,7 +142,7 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-group">
+        <div class="accordion-group" ng-show="support_raw_api">
             <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器API配置(http_api)
@@ -143,11 +193,17 @@
                             <td>是否允许API进行Query查询操作。默认: {{false| sc_filter_enabled}}</td>
                             <td>修改</td>
                         </tr>
+                        <tr>
+                            <td>http_api.raw_api.allow_update</td>
+                            <td sc-pretty="global.http_api.raw_api.allow_update" scp-bool="true"></td>
+                            <td>是否允许API进行Update更新操作。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
+                        </tr>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="accordion-group">
+        <div class="accordion-group" ng-show="support_raw_api">
             <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器心跳汇报(heartbeat)
@@ -190,7 +246,7 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-group">
+        <div class="accordion-group" ng-show="support_raw_api">
             <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器统计信息配置(stats)
@@ -219,7 +275,7 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-group">
+        <div class="accordion-group" ng-show="support_raw_api">
             <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     HTTP服务器配置(http_server)
@@ -253,7 +309,7 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-group">
+        <div class="accordion-group" ng-show="support_raw_api">
             <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     StreamCaster流转换器(stream_caster)
@@ -303,7 +359,7 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-group">
+        <div class="accordion-group" ng-show="support_raw_api">
             <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     虚拟主机(Vhosts)列表, 共配置有{{global.nb_vhosts}}个Vhost

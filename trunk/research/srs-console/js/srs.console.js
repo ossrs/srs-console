@@ -42,10 +42,12 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
 
     // handle system error event, from $sc_system_error service.
     $scope.$on("$sc_utility_http_error", function(event, status, response){
-        if (!status && !response) {
-            response = "无法访问服务器";
-        } else {
-            response = "HTTP/" + status + ", " + response;
+        if (status != 200) {
+            if (!status && !response) {
+                response = "无法访问服务器";
+            } else {
+                response = "HTTP/" + status + ", " + response;
+            }
         }
 
         $sc_utility.log("warn", response);
@@ -226,6 +228,7 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
 
     $scope.support_raw_api = false;
     MSCApi.configs_raw(function(data){
+        $scope.http_api = data.http_api;
         if (!data.http_api || !data.http_api.enabled || !data.http_api.raw_api || !data.http_api.raw_api.enabled) {
             return;
         }
