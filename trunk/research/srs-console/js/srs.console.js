@@ -42,7 +42,12 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
 
     // handle system error event, from $sc_system_error service.
     $scope.$on("$sc_utility_http_error", function(event, status, response){
-        // TODO: FIXME: parse the error.
+        if (!status && !response) {
+            response = "无法访问服务器";
+        } else {
+            response = "HTTP/" + status + ", " + response;
+        }
+
         $sc_utility.log("warn", response);
     });
 
@@ -58,6 +63,17 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
             $location.search("port", $sc_server.port);
         }
     });
+
+    // reset the config.
+    $scope.reset = function(){
+        $sc_server.host = $location.host();
+        $sc_server.port = 1985;
+
+        $location.search("host", $sc_server.host);
+        $location.search("port", $sc_server.port);
+
+        $location.path("/connect")
+    };
 
     $sc_server.init($location);
     //$sc_utility.log("trace", "set baseurl to " + $sc_server.baseurl());
@@ -223,6 +239,17 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
 
     $scope.submit = function(key, value){
         //console.log("submit: " + key + "=" + value);
+
+        if (key == "global.listen") {
+            if (!value) {
+                $sc_utility.log("warn", "raw update global.listen failed, value=" + value);
+                return false;
+            }
+
+            MSCApi.clients_update(key, value);
+        }
+
+        return true;
     };
 
     $sc_utility.log("trace", "Retrieve config info from SRS");
@@ -277,6 +304,9 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         },
         configs_get2: function(id, success) {
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=vhost&vhost=" + id)).success(success);
+        },
+        clients_update: function(scope, value, success) {
+            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=update&scope=" + scope + "&value=" + value)).success(success);
         }
     };
 }]);
@@ -432,6 +462,12 @@ scApp.filter("sc_filter_ctype", function(){
 scApp.filter("sc_filter_obj", function(){
     return function(v) {
         return v != undefined? v : "未设置";
+    };
+});
+
+scApp.filter("sc_filter_less", function(){
+    return function(v) {
+        return v? (v.length > 15? v.substr(0, 15) + "...":v):v;
     };
 });
 
@@ -638,7 +674,13 @@ scApp.directive("scDirective", [function(){
             // previous old value, for cancel and array value.
             $scope.old_value = {
                 init: false,
-                value: undefined
+                changed: false,
+                value: undefined,
+                reset: function(){
+                    this.init = false;
+                    this.changed = false;
+                    this.value = undefined;
+                }
             };
 
             // split select to array.
@@ -652,14 +694,18 @@ scApp.directive("scDirective", [function(){
 
             $scope.commit = function() {
                 // for array, string to array.
-                if ($scope.array == "true") {
+                if ($scope.array == "true" && $scope.value) {
                     $scope.value = $scope.value.split(",");
                 }
 
-                $scope.submit();
-                $scope.editing = false;
+                if ($scope.old_value.init && $scope.old_value.changed) {
+                    if (!$scope.submit()) {
+                        return;
+                    }
+                }
 
-                $scope.old_value.init = false;
+                $scope.editing = false;
+                $scope.old_value.reset();
             };
 
             $scope.load_default = function(){
@@ -673,8 +719,6 @@ scApp.directive("scDirective", [function(){
             };
 
             $scope.cancel = function() {
-                $scope.editing = false;
-
                 if ($scope.old_value.init) {
                     $scope.value = $scope.old_value.value;
                 }
@@ -684,8 +728,23 @@ scApp.directive("scDirective", [function(){
                     $scope.value = $scope.old_value.value;
                 }
 
-                $scope.old_value.init = false;
+                $scope.editing = false;
+                $scope.old_value.reset();
             };
+
+            $scope.$watch("value", function(nv, ov){
+                // not editing.
+                if (!$scope.old_value.init) {
+                    return;
+                }
+
+                // not changed.
+                if (nv == ov) {
+                    return;
+                }
+
+                $scope.old_value.changed = true;
+            });
 
             $scope.$watch("editing", function(nv, ov){
                 // init, ignore.
@@ -712,11 +771,11 @@ scApp.directive("scDirective", [function(){
         }],
         template: ''
             + '<td>{{key}}</td>'
-            + '<td colspan="{{editing? 2:0}}">'
+            + '<td colspan="{{editing? 2:0}}" title="{{value}}">'
                 + '<div class="form-inline">'
                     + '<span class="{{value == undefined?\'label\':\'\'}}" ng-show="!editing">'
                         + '<span ng-show="bool && value != undefined">{{value| sc_filter_enabled}}</span>'
-                        + '<span ng-show="!bool || value == undefined">{{value| sc_filter_obj}}</span>'
+                        + '<span ng-show="!bool || value == undefined">{{value| sc_filter_obj| sc_filter_less}}</span>'
                     + '</span> '
                     + '<input type="text" class="{{span}} inline" ng-show="editing && !bool && !select" ng-model="value"> '
                     + '<label class="checkbox" ng-show="editing && bool"><input type="checkbox" ng-model="value">开启</label> '
@@ -728,7 +787,7 @@ scApp.directive("scDirective", [function(){
             + '<td ng-show="!editing">{{desc}}</td>'
             + '<td class="span1">'
                 + '<a href="javascript:void(0)" ng-click="edit()" ng-show="!editing" title="修改">修改</a> '
-                + '<a href="javascript:void(0)" ng-click="commit()" ng-show="editing" title="提交">提交</a> '
+                + '<a href="javascript:void(0)" ng-click="commit()" ng-show="editing && old_value.changed" title="提交">提交</a> '
                 + '<a href="javascript:void(0)" ng-click="cancel()" ng-show="editing" title="取消">放弃</a> '
             + '</td>',
         link: function(scope, elem, attrs){

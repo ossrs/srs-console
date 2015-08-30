@@ -31,45 +31,45 @@
                                 <th>Opt</th>
                             </tr>
                             <tr sc-directive scd-key="listen" scd-value="global.listen" scd-span="span3"
-                                scd-desc="RTMP服务器侦听的端口，提供RTMP服务，格式是&lt;[address:]port&gt;"
+                                scd-desc="RTMP服务器侦听的端口，提供RTMP服务，格式是&lt;[address:]port&gt;[,&lt;addressN&gt;portN]"
                                 scd-array="true"
-                                scd-submit="submit('listen', global.listen)">
+                                scd-submit="submit('global.listen', global.listen)">
                             </tr>
                             <tr sc-directive scd-key="pid" scd-value="global.pid" scd-span="span3"
                                 scd-desc="服务器使用的PID文件，每个进程必须用一个，否则无法启动。默认: ./objs/srs.pid"
                                 scd-default="./objs/srs.pid"
-                                scd-submit="submit('pid', global.pid)">
+                                scd-submit="submit('global.pid', global.pid)">
                             </tr>
                             <tr sc-directive scd-key="chunk_size" scd-value="global.chunk_size" scd-span="span3"
                                 scd-desc="默认的ChunkSize，即RTMP分包的大小。默认: 60000"
                                 scd-default="60000"
-                                scd-submit="submit('chunk_size', global.chunk_size)">
+                                scd-submit="submit('global.chunk_size', global.chunk_size)">
                             </tr>
                             <tr sc-directive scd-key="ff_log_dir" scd-value="global.ff_log_dir" scd-span="span4"
                                 scd-desc="默认的FFMPEG日志目录，/dev/null禁用日志。默认: ./objs"
                                 scd-default="./objs"
-                                scd-submit="submit('ff_log_dir', global.ff_log_dir)">
+                                scd-submit="submit('global.ff_log_dir', global.ff_log_dir)">
                             </tr>
                             <tr sc-directive scd-key="srs_log_tank" scd-value="global.srs_log_tank" scd-span="span3"
                                 scd-desc="系统的日志容器，即存储方式。默认: file"
                                 scd-default="file", scd-select="file,console"
-                                scd-submit="submit('srs_log_tank', global.srs_log_tank)">
+                                scd-submit="submit('global.srs_log_tank', global.srs_log_tank)">
                             </tr>
                             <tr sc-directive scd-key="srs_log_level" scd-value="global.srs_log_level" scd-span="span3"
                                 scd-desc="系统的日志级别，低于该级别的日志不会打印。默认: trace"
                                 scd-default="trace"
-                                scd-submit="submit('srs_log_level', global.srs_log_level)">
+                                scd-submit="submit('global.srs_log_level', global.srs_log_level)">
                             </tr>
                             <tr sc-directive scd-key="srs_log_file" scd-value="global.srs_log_file" scd-span="span4"
                                 scd-desc="srs_log_file"
                                 scd-default="./objs/srs.log"
-                                scd-submit="submit('srs_log_file', global.srs_log_file)"
+                                scd-submit="submit('global.srs_log_file', global.srs_log_file)"
                                 ng-show="global.srs_log_tank == 'file'">
                             </tr>
                             <tr sc-directive scd-key="max_connections" scd-value="global.max_connections" scd-span="span3"
                                 scd-desc="系统的最大连接数，超过后将拒绝新连接。默认: 1000"
                                 scd-default="1000"
-                                scd-submit="submit('max_connections', global.max_connections)">
+                                scd-submit="submit('global.max_connections', global.max_connections)">
                             </tr>
                             <tr>
                                 <td>daemon</td>
@@ -80,12 +80,12 @@
                             <tr sc-directive scd-key="utc_time" scd-value="global.utc_time" scd-span="span4"
                                 scd-desc="是否启用UTC时间格式，影响日志的时间和路径中包含时间变量的配置。默认: {{false| sc_filter_yesno}}"
                                 scd-default="false"
-                                scd-submit="submit('utc_time', global.utc_time)">
+                                scd-submit="submit('global.utc_time', global.utc_time)">
                             </tr>
                             <tr sc-directive scd-key="pithy_print_ms" scd-value="global.pithy_print_ms" scd-span="span3"
                                 scd-desc="简化形式的日志打印间隔，单位: 毫秒。默认: 10000"
                                 scd-default="10000"
-                                scd-submit="submit('pithy_print_ms', global.pithy_print_ms)">
+                                scd-submit="submit('global.pithy_print_ms', global.pithy_print_ms)">
                             </tr>
                         </table>
                     </div>
