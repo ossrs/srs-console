@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="support_raw_api">
-            <div class="accordion-heading" sc-collapse>
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器全局配置
                 </a>
@@ -28,68 +28,71 @@
                                 <th>Key</th>
                                 <th>Value</th>
                                 <th>Description</th>
+                                <th>Opt</th>
                             </tr>
-                            <tr ng-show="global.listen">
-                                <td>listen</td>
-                                <td>{{global.listen}}</td>
-                                <td>RTMP服务器侦听的端口，提供RTMP服务，格式是&lt;[address:]port&gt;。</td>
+                            <tr sc-directive scd-key="listen" scd-value="global.listen" scd-span="span3"
+                                scd-desc="RTMP服务器侦听的端口，提供RTMP服务，格式是&lt;[address:]port&gt;"
+                                scd-array="true"
+                                scd-submit="submit('listen', global.listen)">
                             </tr>
-                            <tr ng-show="global.pid">
-                                <td>pid</td>
-                                <td>{{global.pid}}</td>
-                                <td>服务器使用的PID文件，每个进程必须用一个，否则无法启动。默认: ./objs/srs.pid</td>
+                            <tr sc-directive scd-key="pid" scd-value="global.pid" scd-span="span3"
+                                scd-desc="服务器使用的PID文件，每个进程必须用一个，否则无法启动。默认: ./objs/srs.pid"
+                                scd-default="./objs/srs.pid"
+                                scd-submit="submit('pid', global.pid)">
                             </tr>
-                            <tr ng-show="global.chunk_size">
-                                <td>chunk_size</td>
-                                <td>{{global.chunk_size}}</td>
-                                <td>默认的ChunkSize，即RTMP分包的大小。默认: 60000</td>
+                            <tr sc-directive scd-key="chunk_size" scd-value="global.chunk_size" scd-span="span3"
+                                scd-desc="默认的ChunkSize，即RTMP分包的大小。默认: 60000"
+                                scd-default="60000"
+                                scd-submit="submit('chunk_size', global.chunk_size)">
                             </tr>
-                            <tr ng-show="global.ff_log_dir">
-                                <td>ff_log_dir</td>
-                                <td>{{global.ff_log_dir}}</td>
-                                <td>默认的FFMPEG日志目录，"/dev/null"禁用日志。默认: ./objs</td>
+                            <tr sc-directive scd-key="ff_log_dir" scd-value="global.ff_log_dir" scd-span="span4"
+                                scd-desc="默认的FFMPEG日志目录，/dev/null禁用日志。默认: ./objs"
+                                scd-default="./objs"
+                                scd-submit="submit('ff_log_dir', global.ff_log_dir)">
                             </tr>
-                            <tr ng-show="global.srs_log_tank">
-                                <td>srs_log_tank</td>
-                                <td>{{global.srs_log_tank}}</td>
-                                <td>系统的日志容器，即存储方式。默认: file</td>
+                            <tr sc-directive scd-key="srs_log_tank" scd-value="global.srs_log_tank" scd-span="span3"
+                                scd-desc="系统的日志容器，即存储方式。默认: file"
+                                scd-default="file", scd-select="file,console"
+                                scd-submit="submit('srs_log_tank', global.srs_log_tank)">
                             </tr>
-                            <tr ng-show="global.srs_log_level">
-                                <td>srs_log_level</td>
-                                <td>{{global.srs_log_level}}</td>
-                                <td>系统的日志级别，低于该级别的日志不会打印。默认: trace</td>
+                            <tr sc-directive scd-key="srs_log_level" scd-value="global.srs_log_level" scd-span="span3"
+                                scd-desc="系统的日志级别，低于该级别的日志不会打印。默认: trace"
+                                scd-default="trace"
+                                scd-submit="submit('srs_log_level', global.srs_log_level)">
                             </tr>
-                            <tr ng-show="global.srs_log_file">
-                                <td>srs_log_file</td>
-                                <td>{{global.srs_log_file}}</td>
-                                <td>系统的日志文件路径，当srs_log_tank为file时有效。默认: ./objs/srs.log</td>
+                            <tr sc-directive scd-key="srs_log_file" scd-value="global.srs_log_file" scd-span="span4"
+                                scd-desc="srs_log_file"
+                                scd-default="./objs/srs.log"
+                                scd-submit="submit('srs_log_file', global.srs_log_file)"
+                                ng-show="global.srs_log_tank == 'file'">
                             </tr>
-                            <tr ng-show="global.max_connections">
-                                <td>max_connections</td>
-                                <td>{{global.max_connections}}</td>
-                                <td>系统的最大连接数，超过后将拒绝新连接。默认: 1000</td>
+                            <tr sc-directive scd-key="max_connections" scd-value="global.max_connections" scd-span="span3"
+                                scd-desc="系统的最大连接数，超过后将拒绝新连接。默认: 1000"
+                                scd-default="1000"
+                                scd-submit="submit('max_connections', global.max_connections)">
                             </tr>
-                            <tr ng-show="global.daemon != undefined">
+                            <tr>
                                 <td>daemon</td>
-                                <td>{{global.daemon| sc_filter_yesno}}</td>
+                                <td sc-pretty="global.daemon" scp-bool="true"></td>
                                 <td>是否以后台启动SRS。默认: {{true| sc_filter_yesno}}</td>
+                                <td>修改</td>
                             </tr>
-                            <tr ng-show="global.utc_time != undefined">
-                                <td>utc_time</td>
-                                <td>{{global.utc_time| sc_filter_yesno}}</td>
-                                <td>是否启用UTC时间格式，影响日志的时间和路径中包含时间变量的配置。默认: {{false| sc_filter_yesno}}</td>
+                            <tr sc-directive scd-key="utc_time" scd-value="global.utc_time" scd-span="span4"
+                                scd-desc="是否启用UTC时间格式，影响日志的时间和路径中包含时间变量的配置。默认: {{false| sc_filter_yesno}}"
+                                scd-default="false"
+                                scd-submit="submit('utc_time', global.utc_time)">
                             </tr>
-                            <tr ng-show="global.pithy_print_ms">
-                                <td>pithy_print_ms</td>
-                                <td>{{global.pithy_print_ms}}</td>
-                                <td>简化形式的日志打印间隔，单位: 毫秒。默认: 10000</td>
+                            <tr sc-directive scd-key="pithy_print_ms" scd-value="global.pithy_print_ms" scd-span="span3"
+                                scd-desc="简化形式的日志打印间隔，单位: 毫秒。默认: 10000"
+                                scd-default="10000"
+                                scd-submit="submit('pithy_print_ms', global.pithy_print_ms)">
                             </tr>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="accordion-group" ng-show="http_api">
+        <div class="accordion-group">
             <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器API配置(http_api)
@@ -102,43 +105,50 @@
                             <th>Key</th>
                             <th>Value</th>
                             <th>Description</th>
+                            <th>Opt</th>
                         </tr>
-                        <tr ng-show="http_api.enabled != undefined">
+                        <tr>
                             <td>http_api.enabled</td>
-                            <td>{{http_api.enabled| sc_filter_enabled}}</td>
+                            <td sc-pretty="global.http_api.enabled" scp-bool="true"></td>
                             <td>是否开启HTTP API，开启后就可以访问SRS提供的API管理服务器。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
                         </tr>
-                        <tr ng-show="http_api.listen">
+                        <tr>
                             <td>http_api.listen</td>
-                            <td>{{http_api.listen}}</td>
+                            <td sc-pretty="global.http_api.listen"></td>
                             <td>HTTP API的侦听地址，格式是&lt;[address:]port&gt;。默认: 1985</td>
+                            <td>修改</td>
                         </tr>
-                        <tr ng-show="http_api.crossdomain != undefined">
+                        <tr>
                             <td>http_api.crossdomain</td>
-                            <td>{{http_api.crossdomain| sc_filter_enabled}}</td>
-                            <td>是否允许JS跨域，开启后JS可以直接跨域。另外JS还可以通过JSONP访问。默认: {{true| sc_filter_enabled}}</td>
+                            <td sc-pretty="global.http_api.crossdomain" scp-bool="true"></td>
+                            <td>是否允许JS跨域，开启后JS可以直接跨域(还可以通过JSONP访问)。默认: {{true| sc_filter_enabled}}</td>
+                            <td>修改</td>
                         </tr>
-                        <tr ng-show="http_api.raw_api.enabled != undefined">
+                        <tr>
                             <td>http_api.raw_api.enabled</td>
-                            <td>{{http_api.raw_api.enabled| sc_filter_enabled}}</td>
+                            <td sc-pretty="global.http_api.raw_api.enabled" scp-bool="true"></td>
                             <td>是否开启HTTP RAW API，允许API修改服务器配置。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
                         </tr>
-                        <tr ng-show="http_api.raw_api.allow_reload !=undefined">
+                        <tr>
                             <td>http_api.raw_api.allow_reload</td>
-                            <td>{{http_api.raw_api.allow_reload| sc_filter_enabled}}</td>
+                            <td sc-pretty="global.http_api.raw_api.allow_reload" scp-bool="true"></td>
                             <td>是否允许API进行Reload操作。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
                         </tr>
-                        <tr ng-show="http_api.raw_api.allow_query !=undefined">
+                        <tr>
                             <td>http_api.raw_api.allow_query</td>
-                            <td>{{http_api.raw_api.allow_query| sc_filter_enabled}}</td>
+                            <td sc-pretty="global.http_api.raw_api.allow_query" scp-bool="true"></td>
                             <td>是否允许API进行Query查询操作。默认: {{false| sc_filter_enabled}}</td>
+                            <td>修改</td>
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="accordion-group" ng-show="support_raw_api && global.heartbeat">
-            <div class="accordion-heading" sc-collapse>
+        <div class="accordion-group">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器心跳汇报(heartbeat)
                 </a>
@@ -150,38 +160,38 @@
                             <th>Key</th>
                             <th>Value</th>
                             <th>Description</th>
+                            <th>Opt</th>
                         </tr>
-                        <tr ng-show="global.heartbeat.enabled != undefined">
-                            <td>heartbeat.enabled</td>
-                            <td>{{global.heartbeat.enabled| sc_filter_enabled}}</td>
-                            <td>是否开启服务器心跳，向外部系统汇报。默认: {{false| sc_filter_enabled}}</td>
+                        <tr sc-directive scd-key="global.heartbeat.enabled" scd-value="global.heartbeat.enabled" scd-span="span3"
+                            scd-desc="是否开启服务器心跳，向外部系统汇报。默认: {{false| sc_filter_enabled}}"
+                            scd-default="false" scd-bool="true"
+                            scd-submit="submit('global.heartbeat.enabled', global.heartbeat.enabled)">
                         </tr>
-                        <tr ng-show="global.heartbeat.interval">
-                            <td>heartbeat.interval</td>
-                            <td>{{global.heartbeat.interval}}</td>
-                            <td>心跳间隔的时间，单位: 秒。默认: 9.9</td>
+                        <tr sc-directive scd-key="global.heartbeat.interval" scd-value="global.heartbeat.interval" scd-span="span3"
+                            scd-desc="心跳间隔的时间，单位: 秒。默认: 9.9"
+                            scd-default="9.9"
+                            scd-submit="submit('global.heartbeat.interval', global.heartbeat.interval)">
                         </tr>
-                        <tr ng-show="global.heartbeat.url">
-                            <td>heartbeat.url</td>
-                            <td>{{global.heartbeat.url}}</td>
-                            <td>汇报的HTTP服务器地址，汇报信息格式是JSON。默认: http://127.0.0.1:8085/api/v1/servers</td>
+                        <tr sc-directive scd-key="global.heartbeat.url" scd-value="global.heartbeat.url" scd-span="span5"
+                            scd-desc="汇报的HTTP服务器地址，汇报信息格式是JSON。默认: http://127.0.0.1:8085/api/v1/servers"
+                            scd-default="http://127.0.0.1:8085/api/v1/servers"
+                            scd-submit="submit('global.heartbeat.url', global.heartbeat.url)">
                         </tr>
-                        <tr ng-show="global.heartbeat.device_id">
-                            <td>heartbeat.device_id</td>
-                            <td>{{global.heartbeat.device_id}}</td>
-                            <td>设备ID，SRS会写入汇报信息中。</td>
+                        <tr sc-directive scd-key="global.heartbeat.device_id" scd-value="global.heartbeat.device_id" scd-span="span5"
+                            scd-desc="设备ID，SRS会写入汇报信息中。"
+                            scd-submit="submit('global.heartbeat.device_id', global.heartbeat.device_id)">
                         </tr>
-                        <tr ng-show="global.heartbeat.summaries != undefined">
-                            <td>heartbeat.summaries</td>
-                            <td>{{global.heartbeat.summaries| sc_filter_yesno}}</td>
-                            <td>是否汇报摘要，即服务器的summaries信息。默认: {{false| sc_filter_yesno}}</td>
+                        <tr sc-directive scd-key="global.heartbeat.summaries" scd-value="global.heartbeat.summaries" scd-span="span3"
+                            scd-desc="是否汇报摘要，即服务器的summaries信息。默认: {{false| sc_filter_yesno}}"
+                            scd-default="false" scd-bool="true"
+                            scd-submit="submit('global.heartbeat.summaries', global.heartbeat.summaries)">
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="accordion-group" ng-show="support_raw_api && global.stats">
-            <div class="accordion-heading" sc-collapse>
+        <div class="accordion-group">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器统计信息配置(stats)
                 </a>
@@ -193,23 +203,24 @@
                             <th>Key</th>
                             <th>Value</th>
                             <th>Description</th>
+                            <th>Opt</th>
                         </tr>
-                        <tr ng-show="global.stats.network != undefined">
-                            <td>stats.network</td>
-                            <td>{{global.stats.network}}</td>
-                            <td>统计的网卡索引，从0开始算第一块网卡。默认: 0</td>
+                        <tr sc-directive scd-key="global.stats.network" scd-value="global.stats.network" scd-span="span3"
+                            scd-desc="统计的网卡索引，从0开始算第一块网卡。默认: 0"
+                            scd-default="0"
+                            scd-submit="submit('global.stats.network', global.stats.network)">
                         </tr>
-                        <tr ng-show="global.stats.disk">
-                            <td>stats.disk</td>
-                            <td>{{global.stats.disk}}</td>
-                            <td>统计的磁盘名称，可以在/proc/diskstats中查看。</td>
+                        <tr sc-directive scd-key="global.stats.disk" scd-value="global.stats.disk" scd-span="span3"
+                            scd-desc="统计的磁盘名称，可以在/proc/diskstats中查看。"
+                            scd-array="true"
+                            scd-submit="submit('global.stats.disk', global.stats.disk)">
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="accordion-group" ng-show="support_raw_api && global.http_server">
-            <div class="accordion-heading" sc-collapse>
+        <div class="accordion-group">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     HTTP服务器配置(http_server)
                 </a>
@@ -221,28 +232,29 @@
                             <th>Key</th>
                             <th>Value</th>
                             <th>Description</th>
+                            <th>Opt</th>
                         </tr>
-                        <tr ng-show="global.http_server.enabled != undefined">
-                            <td>http_server.enabled</td>
-                            <td>{{global.http_server.enabled| sc_filter_enabled}}</td>
-                            <td>是否开启HTTP文件服务器和HTTP流服务器。默认: {{false| sc_filter_enabled}}</td>
+                        <tr sc-directive scd-key="global.http_server.enabled" scd-value="global.http_server.enabled" scd-span="span3"
+                            scd-desc="是否开启HTTP文件服务器和HTTP流服务器。默认: {{false| sc_filter_enabled}}"
+                            scd-default="false" scd-bool="true"
+                            scd-submit="submit('global.http_server.enabled', global.http_server.enabled)">
                         </tr>
-                        <tr ng-show="global.http_server.listen">
-                            <td>http_server.listen</td>
-                            <td>{{global.http_server.listen}}</td>
-                            <td>HTTP服务器侦听的地址，格式是&lt;[address:]port&gt;[,[address:]port]。默认: 8080</td>
+                        <tr sc-directive scd-key="global.http_server.listen" scd-value="global.http_server.listen" scd-span="span3"
+                            scd-desc="HTTP服务器侦听的地址，格式是&lt;[address:]port&gt;。默认: 8080"
+                            scd-default="8080"
+                            scd-submit="submit('global.http_server.listen', global.http_server.listen)">
                         </tr>
-                        <tr ng-show="global.http_server.dir">
-                            <td>http_server.dir</td>
-                            <td>{{global.http_server.dir}}</td>
-                            <td>HTTP服务器的主目录。默认: ./objs/nginx/html</td>
+                        <tr sc-directive scd-key="global.http_server.dir" scd-value="global.http_server.dir" scd-span="span5"
+                            scd-desc="HTTP服务器的主目录。默认: ./objs/nginx/html"
+                            scd-default="./objs/nginx/html"
+                            scd-submit="submit('global.http_server.dir', global.http_server.dir)">
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="accordion-group" ng-show="support_raw_api && global.stream_caster">
-            <div class="accordion-heading" sc-collapse>
+        <div class="accordion-group">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     StreamCaster流转换器(stream_caster)
                 </a>
@@ -254,42 +266,44 @@
                             <th>Key</th>
                             <th>Value</th>
                             <th>Description</th>
+                            <td>Opt</td>
                         </tr>
-                        <tr ng-show="global.stream_caster.enabled != undefined">
-                            <td>stream_caster.enabled</td>
-                            <td>{{global.stream_caster.enabled| sc_filter_enabled}}</td>
-                            <td>是否开启StreamCaster，即接收特殊的流后转换成RTMP送到SRS。默认: {{false| sc_filter_enabled}}</td>
+                        <tr sc-directive scd-key="global.stream_caster.enabled" scd-value="global.stream_caster.enabled" scd-span="span3"
+                            scd-desc="是否开启StreamCaster，即接收特殊的流后转换成RTMP送到SRS。默认: {{false| sc_filter_enabled}}"
+                            scd-default="false" scd-bool="true"
+                            scd-submit="submit('global.stream_caster.enabled', global.stream_caster.enabled)">
                         </tr>
-                        <tr ng-show="global.stream_caster.caster">
-                            <td>stream_caster.caster</td>
-                            <td>{{global.stream_caster.caster}}</td>
-                            <td>转换器的类型，不同的类型需要不同的配置。</td>
+                        <tr sc-directive scd-key="global.stream_caster.caster" scd-value="global.stream_caster.caster" scd-span="span3"
+                            scd-desc="转换器的类型，不同的类型需要不同的配置，mpegts_over_udp,rtsp,flv"
+                            scd-select="mpegts_over_udp,rtsp,flv"
+                            scd-submit="submit('global.stream_caster.caster', global.stream_caster.caster)"
+                            ng-show="global.stream_caster.enabled">
                         </tr>
-                        <tr ng-show="global.stream_caster.output">
-                            <td>stream_caster.output</td>
-                            <td>{{global.stream_caster.output}}</td>
-                            <td>输出的RTMP地址，转换器侦听端口，接收特定的流，转换成RTMP后送到SRS。</td>
+                        <tr sc-directive scd-key="global.stream_caster.output" scd-value="global.stream_caster.output" scd-span="span5"
+                            scd-desc="输出的RTMP地址，转换器侦听端口，接收特定的流，转换成RTMP后送到SRS。"
+                            scd-submit="submit('global.stream_caster.output', global.stream_caster.output)"
+                            ng-show="global.stream_caster.enabled">
                         </tr>
-                        <tr ng-show="global.stream_caster.listen">
-                            <td>stream_caster.listen</td>
-                            <td>{{global.stream_caster.listen}}</td>
-                            <td>转换器侦听的地址，格式是&lt;port&gt;</td>
+                        <tr sc-directive scd-key="global.stream_caster.listen" scd-value="global.stream_caster.listen" scd-span="span3"
+                            scd-desc="转换器侦听的地址，格式是&lt;port&gt;"
+                            scd-submit="submit('global.stream_caster.listen', global.stream_caster.listen)"
+                            ng-show="global.stream_caster.enabled">
                         </tr>
-                        <tr ng-show="global.stream_caster.rtp_port_min && global.stream_caster.rtp_port_max">
-                            <td>stream_caster.rtp_port_min</td>
-                            <td>{{global.stream_caster.rtp_port_min}}</td>
-                            <td>RTP的最小端口，转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。</td>
+                        <tr sc-directive scd-key="global.stream_caster.rtp_port_min" scd-value="global.stream_caster.rtp_port_min" scd-span="span3"
+                            scd-desc="转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。"
+                            scd-submit="submit('global.stream_caster.rtp_port_min', global.stream_caster.rtp_port_min)"
+                            ng-show="global.stream_caster.enabled && global.stream_caster.caster == 'rtsp'">
                         </tr>
-                        <tr ng-show="global.stream_caster.rtp_port_min && global.stream_caster.rtp_port_max">
-                            <td>stream_caster.rtp_port_max</td>
-                            <td>{{global.stream_caster.rtp_port_max}}</td>
-                            <td>RTP的最大端口，转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。</td>
+                        <tr sc-directive scd-key="global.stream_caster.rtp_port_max" scd-value="global.stream_caster.rtp_port_max" scd-span="span3"
+                            scd-desc="转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。"
+                            scd-submit="submit('global.stream_caster.rtp_port_max', global.stream_caster.rtp_port_max)"
+                            ng-show="global.stream_caster.enabled && global.stream_caster.caster == 'rtsp'">
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="accordion-group" ng-show="support_raw_api && global.nb_vhosts">
+        <div class="accordion-group">
             <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     虚拟主机(Vhosts)列表, 共配置有{{global.nb_vhosts}}个Vhost
@@ -348,7 +362,7 @@
                             <td ng-show="false">{{vhost.atc| sc_filter_yn}}</td>
                             <td>{{vhost.transcode| sc_filter_yn}}</td>
                             <td>{{vhost.ingest| sc_filter_yn}}</td>
-                            <td><a href="#/configs/{{vhost.name}}" class="icon-wrench"></a></td>
+                            <td><a href="#/configs/{{vhost.name}}">详细</a></td>
                         </tr>
                     </table>
                 </div>

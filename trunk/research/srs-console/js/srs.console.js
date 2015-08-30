@@ -210,23 +210,20 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
 
     $scope.support_raw_api = false;
     MSCApi.configs_raw(function(data){
-        $scope.http_api = data.http_api;
-
         if (!data.http_api || !data.http_api.enabled || !data.http_api.raw_api || !data.http_api.raw_api.enabled) {
             return;
         }
 
-        $sc_utility.refresh.refresh_change(function(){
-            MSCApi.configs_get(function(data){
-                $scope.global = data.global;
-                $scope.support_raw_api = true;
-
-                $sc_utility.refresh.request();
-            });
-        }, 3000);
-
-        $sc_utility.refresh.request(0);
+        MSCApi.configs_get(function(data){
+            $scope.global = data.global;
+            $scope.support_raw_api = true;
+            //console.log(data);
+        });
     });
+
+    $scope.submit = function(key, value){
+        //console.log("submit: " + key + "=" + value);
+    };
 
     $sc_utility.log("trace", "Retrieve config info from SRS");
 }]);
@@ -432,6 +429,12 @@ scApp.filter("sc_filter_ctype", function(){
     };
 });
 
+scApp.filter("sc_filter_obj", function(){
+    return function(v) {
+        return v != undefined? v : "未设置";
+    };
+});
+
 scApp.filter("sc_filter_security", function(){
     return function(v) {
         var action = v.action == "allow"? "允许":"禁止";
@@ -539,12 +542,29 @@ scApp.provider("$sc_utility", function(){
 });
 
 // sc-collapse: scCollapse
+/**
+ * Usage:
+        <div class="accordion">
+            <div class="accordion-group">
+                <div class="accordion-heading" sc-collapse="in">
+                    <a class="accordion-toggle" href="javascript:void(0)">
+                        HTTP RAW API
+                    </a>
+                </div>
+                <div class="accordion-body collapse">
+                    <div class="accordion-inner">
+                        该服务器不支持HTTP RAW API，或者配置中禁用了该功能。
+                    </div>
+                </div>
+            </div>
+        </div>
+ */
 scApp.directive('scCollapse', ["$sc_utility", function($sc_utility){
     return {
         restrict: 'A',
         scope: true,
-        controller: function($scope) {
-        },
+        controller: ['$scope', function($scope) {
+        }],
         compile: function(elem, attrs) {
             return function(scope, elem, attrs){
                 if (attrs.scCollapse == "in") {
@@ -557,6 +577,161 @@ scApp.directive('scCollapse', ["$sc_utility", function($sc_utility){
                     obj.toggleClass('in');
                 });
             };
+        }
+    };
+}]);
+
+// sc-pretty: scPretty
+/**
+ * Usage:
+        <tr>
+            <td>daemon</td>
+            <td sc-pretty="global.daemon" scp-bool="true"></td>
+            <td>是否以后台启动SRS。默认: {{true| sc_filter_yesno}}</td>
+            <td>修改</td>
+        </tr>
+ */
+scApp.directive("scPretty", [function(){
+    return {
+        restrict: 'A',
+        scope: {
+            data: '=scPretty',
+            bool: '@scpBool'
+        },
+        template: ''
+            + '<span class="{{data == undefined? \'label\':\'\'}}">'
+                + '<span ng-show="bool && data != undefined">{{data| sc_filter_enabled}}</span>'
+                + '<span ng-show="!bool || data == undefined">{{data| sc_filter_obj}}</span>'
+            + '</span>'
+    };
+}]);
+
+// sc-directive: scDirective
+/**
+ * Usage:
+        <tr sc-directive scd-key="xxxxxx" scd-value="global.xxxxxx" scd-span="span3"
+            scd-desc="xxxxxx"
+            scd-default="xxxxxx"
+            scd-array="true"
+            scd-bool="true"
+            scd-submit="submit('xxxxxx', global.xxxxxx)">
+        </tr>
+ */
+scApp.directive("scDirective", [function(){
+    return {
+        restrict: 'A',
+        scope: {
+            key: '@scdKey',
+            value: '=scdValue',
+            desc: '@scdDesc',
+            submit: '&scdSubmit',
+            span: '@scdSpan',
+            default: '@scdDefault',
+            array: '@scdArray',
+            bool: '@scdBool',
+            select: '@scdSelect'
+        },
+        controller: ['$scope', function($scope) {
+            // whether current directive is editing.
+            $scope.editing = false;
+
+            // previous old value, for cancel and array value.
+            $scope.old_value = {
+                init: false,
+                value: undefined
+            };
+
+            // split select to array.
+            if (typeof $scope.select == "string" && $scope.select && !$scope.selects) {
+                $scope.selects = $scope.select.split(",");
+            }
+
+            $scope.edit = function() {
+                $scope.editing = true;
+            };
+
+            $scope.commit = function() {
+                // for array, string to array.
+                if ($scope.array == "true") {
+                    $scope.value = $scope.value.split(",");
+                }
+
+                $scope.submit();
+                $scope.editing = false;
+
+                $scope.old_value.init = false;
+            };
+
+            $scope.load_default = function(){
+                if ($scope.default != undefined) {
+                    if ($scope.bool) {
+                        $scope.value = $scope.default == "true";
+                    } else {
+                        $scope.value = $scope.default;
+                    }
+                }
+            };
+
+            $scope.cancel = function() {
+                $scope.editing = false;
+
+                if ($scope.old_value.init) {
+                    $scope.value = $scope.old_value.value;
+                }
+
+                // for array, always restore it when cancel.
+                if ($scope.array == "true") {
+                    $scope.value = $scope.old_value.value;
+                }
+
+                $scope.old_value.init = false;
+            };
+
+            $scope.$watch("editing", function(nv, ov){
+                // init, ignore.
+                if (!nv && !nv) {
+                    return;
+                }
+
+                // save the old value.
+                if (!$scope.old_value.init) {
+                    $scope.old_value.value = $scope.value;
+                    $scope.old_value.init = true;
+                }
+
+                // start editing.
+                if (nv && !ov) {
+                    // for array, array to string.
+                    if ($scope.array == "true") {
+                        $scope.value = $scope.value.join(",");
+                    }
+                }
+
+                //console.log($scope.value);
+            });
+        }],
+        template: ''
+            + '<td>{{key}}</td>'
+            + '<td colspan="{{editing? 2:0}}">'
+                + '<div class="form-inline">'
+                    + '<span class="{{value == undefined?\'label\':\'\'}}" ng-show="!editing">'
+                        + '<span ng-show="bool && value != undefined">{{value| sc_filter_enabled}}</span>'
+                        + '<span ng-show="!bool || value == undefined">{{value| sc_filter_obj}}</span>'
+                    + '</span> '
+                    + '<input type="text" class="{{span}} inline" ng-show="editing && !bool && !select" ng-model="value"> '
+                    + '<label class="checkbox" ng-show="editing && bool"><input type="checkbox" ng-model="value">开启</label> '
+                    + '<select ng-model="value" ng-options="s as s for s in selects" ng-show="editing && select"></select>'
+                    + '<a href="javascript:void(0)" ng-click="load_default()" ng-show="editing && default != undefined" title="使用默认值">使用默认值</a> '
+                + '</div>'
+                + '<div ng-show="editing">{{desc}}</div>'
+            + '</td>'
+            + '<td ng-show="!editing">{{desc}}</td>'
+            + '<td class="span1">'
+                + '<a href="javascript:void(0)" ng-click="edit()" ng-show="!editing" title="修改">修改</a> '
+                + '<a href="javascript:void(0)" ng-click="commit()" ng-show="editing" title="提交">提交</a> '
+                + '<a href="javascript:void(0)" ng-click="cancel()" ng-show="editing" title="取消">放弃</a> '
+            + '</td>',
+        link: function(scope, elem, attrs){
         }
     };
 }]);
