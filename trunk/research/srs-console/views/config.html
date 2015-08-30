@@ -1,7 +1,7 @@
 <div>
     <div class="accordion">
         <div class="accordion-group">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost Summary, 概览
                 </a>
@@ -54,7 +54,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.cluster">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost Cluster, 流集群设置
                 </a>
@@ -97,7 +97,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.forward">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost Forward, 转发设置
                 </a>
@@ -125,7 +125,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.play">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost Play, 播放客户端设置
                 </a>
@@ -188,7 +188,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.publish">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost Publish, 推流客户端设置
                 </a>
@@ -226,7 +226,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.refer || vhost.cluster">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost Hotlink Denial, 防盗链设置
                 </a>
@@ -270,7 +270,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.bandcheck">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost Bandcheck, 带宽测试
                 </a>
@@ -308,7 +308,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.security">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost Security, 安全设置
                 </a>
@@ -341,7 +341,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.http_static">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost HTTP Static, HTTP静态服务器
                 </a>
@@ -374,7 +374,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.http_remux">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost HTTP Remux, HTTP流服务器
                 </a>
@@ -412,7 +412,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.http_hooks">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost HTTP Callbacks/Hooks, HTTP回调
                 </a>
@@ -480,7 +480,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.exec">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost Exec, 执行外部程序
                 </a>
@@ -508,7 +508,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.hls || vhost.http_hooks">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost HLS, HLS流
                 </a>
@@ -635,7 +635,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.hds">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost HDS, HDS流
                 </a>
@@ -673,7 +673,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.dvr || vhost.http_hooks">
-            <div class="accordion-heading" sc-collapse="false">
+            <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     Vhost DVR, 直播录制
                 </a>
@@ -723,6 +723,293 @@
                             <td>当服务器DVR关闭文件时的回调。</td>
                         </tr>
                     </table>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group" ng-repeat="ingest in vhost.ingests">
+            <div class="accordion-heading" sc-collapse="in">
+                <a class="accordion-toggle" href="javascript:void(0)">
+                    Vhost Ingest, 采集, id={{ingest.id}}
+                </a>
+            </div>
+            <div class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <table class="table table-striped table-hover table-bordered">
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr ng-show="ingest.enabled != undefined">
+                            <td>ingest.enabled</td>
+                            <td>{{ingest.enabled| sc_filter_enabled}}</td>
+                            <td>是否开启采集。默认: {{false| sc_filter_enabled}}。</td>
+                        </tr>
+                        <tr ng-show="ingest.input.type">
+                            <td>ingest.input.type</td>
+                            <td>{{ingest.input.type}}</td>
+                            <td>采集的类型，file: 文件；stream: 流。默认: file</td>
+                        </tr>
+                        <tr ng-show="ingest.input.url">
+                            <td>ingest.input.url</td>
+                            <td><span title="{{ingest.input.url}}">URL</span></td>
+                            <td>采集的地址。</td>
+                        </tr>
+                    </table>
+                    <div class="accordion-group" ng-repeat="engine in [ingest.engine]">
+                        <div class="accordion-heading" sc-collapse="in">
+                            <a class="accordion-toggle" href="javascript:void(0)">
+                                Ingest Engine, 采集引擎 <span ng-show="engine.id">id={{engine.id}}</span>
+                            </a>
+                        </div>
+                        <div class="accordion-body collapse">
+                            <div class="accordion-inner">
+                                <table class="table table-striped table-hover table-bordered">
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    <tr ng-show="engine.enabled != undefined">
+                                        <td>engine.enabled</td>
+                                        <td>{{engine.enabled| sc_filter_enabled}}</td>
+                                        <td>是否开启转码引擎。默认: {{false| sc_filter_enabled}}。</td>
+                                    </tr>
+                                    <tr ng-show="engine.iformat">
+                                        <td>engine.iformat</td>
+                                        <td>{{engine.iformat}}</td>
+                                        <td>引擎的输入格式，即"-i v"。默认: flv</td>
+                                    </tr>
+                                    <tr ng-show="engine.vfilter">
+                                        <td>engine.vfilter</td>
+                                        <td><p ng-repeat="(fk, fv) in engine.vfilter">-{{fk}} {{fv}}</p></td>
+                                        <td>引擎的视频参数，譬如滤镜，在"-i"和"-vcodec"之间的参数。</td>
+                                    </tr>
+                                    <tr ng-show="engine.vcodec">
+                                        <td>engine.vcodec</td>
+                                        <td>{{engine.vcodec}}</td>
+                                        <td>引擎的视频编码器，即"-vcodec v"，可以是libx264,copy,vn</td>
+                                    </tr>
+                                    <tr ng-show="engine.vbitrate">
+                                        <td>engine.vbitrate</td>
+                                        <td>{{engine.vbitrate}}</td>
+                                        <td>Kbps。编码器输出的视频码率，即"-v:b v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.vfps">
+                                        <td>engine.vfps</td>
+                                        <td>{{engine.vfps}}</td>
+                                        <td>fps。编码器输出的视频帧率，即"-r v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.vwidth">
+                                        <td>engine.vwidth</td>
+                                        <td>{{engine.vwidth}}</td>
+                                        <td>px。编码器输出的视频宽度，即"-s v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.vheight">
+                                        <td>engine.vheight</td>
+                                        <td>{{engine.vheight}}</td>
+                                        <td>px。编码器输出的视频高度，即"-s v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.vthreads">
+                                        <td>engine.vthreads</td>
+                                        <td>{{engine.vthreads}}</td>
+                                        <td>编码器使用的最多线程数，即"-thread v"。默认: 1</td>
+                                    </tr>
+                                    <tr ng-show="engine.vprofile">
+                                        <td>engine.vprofile</td>
+                                        <td>{{engine.vprofile}}</td>
+                                        <td>视频的编码profile，即"-profile:v v"，可以是high,main,baseline</td>
+                                    </tr>
+                                    <tr ng-show="engine.vpreset">
+                                        <td>engine.vpreset</td>
+                                        <td>{{engine.vpreset}}</td>
+                                        <td>视频的编码preset，即"-preset v"，可以是medium,slow,slower,veryslow,placebo</td>
+                                    </tr>
+                                    <tr ng-show="engine.vparams">
+                                        <td>engine.vparams</td>
+                                        <td><p ng-repeat="(fk, fv) in engine.vparams">-{{fk}} {{fv}}</p></td>
+                                        <td>引擎的视频转码参数，譬如264的参数，在"-vpreset"和"-acodec"之前的参数。</td>
+                                    </tr>
+                                    <tr ng-show="engine.acodec">
+                                        <td>engine.acodec</td>
+                                        <td>{{engine.acodec}}</td>
+                                        <td>音频编码器，即"-acodec v"，可以是libfdk_aac,copy,an</td>
+                                    </tr>
+                                    <tr ng-show="engine.abitrate">
+                                        <td>engine.abitrate</td>
+                                        <td>{{engine.abitrate}}</td>
+                                        <td>Kbps。编码器输出的音频码率，即"-b:a v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.asample_rate">
+                                        <td>engine.asample_rate</td>
+                                        <td>{{engine.asample_rate}}</td>
+                                        <td>编码器输出的音频采样率，即"-ar v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.achannels">
+                                        <td>engine.achannels</td>
+                                        <td>{{engine.achannels}}</td>
+                                        <td>编码器输出的音频声道，即"-ac v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.aparams">
+                                        <td>engine.aparams</td>
+                                        <td><p ng-repeat="(fk, fv) in engine.aparams">-{{fk}} {{fv}}</p></td>
+                                        <td>引擎的音频转码参数，譬如aac的参数，在"-ac"和"-f"/"-y"之前的参数。</td>
+                                    </tr>
+                                    <tr ng-show="engine.oformat">
+                                        <td>engine.oformat</td>
+                                        <td>{{engine.oformat}}</td>
+                                        <td>编码器输出的格式，可选。默认: flv</td>
+                                    </tr>
+                                    <tr ng-show="engine.output">
+                                        <td>engine.output</td>
+                                        <td><span title="{{engine.output}}">URL</span></td>
+                                        <td>编码器输出的url，可以使用变量[vhost],[port],[app],[stream]<span ng-show="engine.id">,[engine]</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group" ng-repeat="transcode in vhost.transcodes">
+            <div class="accordion-heading" sc-collapse="in">
+                <a class="accordion-toggle" href="javascript:void(0)">
+                    Vhost Transcode, 转码, apply={{transcode.apply? transcode.apply:"vhost"}}
+                </a>
+            </div>
+            <div class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <table class="table table-striped table-hover table-bordered">
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr ng-show="transcode.enabled != undefined">
+                            <td>transcode.enabled</td>
+                            <td>{{transcode.enabled| sc_filter_enabled}}</td>
+                            <td>是否开启转码。默认: {{false| sc_filter_enabled}}。</td>
+                        </tr>
+                        <tr ng-show="transcode.ffmpeg">
+                            <td>transcode.ffmpeg</td>
+                            <td><span title="{{transcode.ffmpeg}}">{{transcode.ffmpeg}}</span></td>
+                            <td>编码器的地址。</td>
+                        </tr>
+                    </table>
+                    <div class="accordion-group" ng-repeat="engine in transcode.engines">
+                        <div class="accordion-heading" sc-collapse="in">
+                            <a class="accordion-toggle" href="javascript:void(0)">
+                                Transcode Engine, 转码引擎 <span ng-show="engine.id">id={{engine.id}}</span>
+                            </a>
+                        </div>
+                        <div class="accordion-body collapse">
+                            <div class="accordion-inner">
+                                <table class="table table-striped table-hover table-bordered">
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    <tr ng-show="engine.enabled != undefined">
+                                        <td>engine.enabled</td>
+                                        <td>{{engine.enabled| sc_filter_enabled}}</td>
+                                        <td>是否开启转码引擎。默认: {{false| sc_filter_enabled}}。</td>
+                                    </tr>
+                                    <tr ng-show="engine.iformat">
+                                        <td>engine.iformat</td>
+                                        <td>{{engine.iformat}}</td>
+                                        <td>引擎的输入格式，即"-i v"。默认: flv</td>
+                                    </tr>
+                                    <tr ng-show="engine.vfilter">
+                                        <td>engine.vfilter</td>
+                                        <td><p ng-repeat="(fk, fv) in engine.vfilter">-{{fk}} {{fv}}</p></td>
+                                        <td>引擎的视频参数，譬如滤镜，在"-i"和"-vcodec"之间的参数。</td>
+                                    </tr>
+                                    <tr ng-show="engine.vcodec">
+                                        <td>engine.vcodec</td>
+                                        <td>{{engine.vcodec}}</td>
+                                        <td>引擎的视频编码器，即"-vcodec v"，可以是libx264,copy,vn</td>
+                                    </tr>
+                                    <tr ng-show="engine.vbitrate">
+                                        <td>engine.vbitrate</td>
+                                        <td>{{engine.vbitrate}}</td>
+                                        <td>Kbps。编码器输出的视频码率，即"-v:b v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.vfps">
+                                        <td>engine.vfps</td>
+                                        <td>{{engine.vfps}}</td>
+                                        <td>fps。编码器输出的视频帧率，即"-r v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.vwidth">
+                                        <td>engine.vwidth</td>
+                                        <td>{{engine.vwidth}}</td>
+                                        <td>px。编码器输出的视频宽度，即"-s v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.vheight">
+                                        <td>engine.vheight</td>
+                                        <td>{{engine.vheight}}</td>
+                                        <td>px。编码器输出的视频高度，即"-s v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.vthreads">
+                                        <td>engine.vthreads</td>
+                                        <td>{{engine.vthreads}}</td>
+                                        <td>编码器使用的最多线程数，即"-thread v"。默认: 1</td>
+                                    </tr>
+                                    <tr ng-show="engine.vprofile">
+                                        <td>engine.vprofile</td>
+                                        <td>{{engine.vprofile}}</td>
+                                        <td>视频的编码profile，即"-profile:v v"，可以是high,main,baseline</td>
+                                    </tr>
+                                    <tr ng-show="engine.vpreset">
+                                        <td>engine.vpreset</td>
+                                        <td>{{engine.vpreset}}</td>
+                                        <td>视频的编码preset，即"-preset v"，可以是medium,slow,slower,veryslow,placebo</td>
+                                    </tr>
+                                    <tr ng-show="engine.vparams">
+                                        <td>engine.vparams</td>
+                                        <td><p ng-repeat="(fk, fv) in engine.vparams">-{{fk}} {{fv}}</p></td>
+                                        <td>引擎的视频转码参数，譬如264的参数，在"-vpreset"和"-acodec"之前的参数。</td>
+                                    </tr>
+                                    <tr ng-show="engine.acodec">
+                                        <td>engine.acodec</td>
+                                        <td>{{engine.acodec}}</td>
+                                        <td>音频编码器，即"-acodec v"，可以是libfdk_aac,copy,an</td>
+                                    </tr>
+                                    <tr ng-show="engine.abitrate">
+                                        <td>engine.abitrate</td>
+                                        <td>{{engine.abitrate}}</td>
+                                        <td>Kbps。编码器输出的音频码率，即"-b:a v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.asample_rate">
+                                        <td>engine.asample_rate</td>
+                                        <td>{{engine.asample_rate}}</td>
+                                        <td>编码器输出的音频采样率，即"-ar v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.achannels">
+                                        <td>engine.achannels</td>
+                                        <td>{{engine.achannels}}</td>
+                                        <td>编码器输出的音频声道，即"-ac v"。0表示跟随源。默认: 0</td>
+                                    </tr>
+                                    <tr ng-show="engine.aparams">
+                                        <td>engine.aparams</td>
+                                        <td><p ng-repeat="(fk, fv) in engine.aparams">-{{fk}} {{fv}}</p></td>
+                                        <td>引擎的音频转码参数，譬如aac的参数，在"-ac"和"-f"/"-y"之前的参数。</td>
+                                    </tr>
+                                    <tr ng-show="engine.oformat">
+                                        <td>engine.oformat</td>
+                                        <td>{{engine.oformat}}</td>
+                                        <td>编码器输出的格式，可选。默认: flv</td>
+                                    </tr>
+                                    <tr ng-show="engine.output">
+                                        <td>engine.output</td>
+                                        <td><span title="{{engine.output}}">URL</span></td>
+                                        <td>编码器输出的url，可以使用变量[vhost],[port],[app],[stream]<span ng-show="engine.id">,[engine]</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
