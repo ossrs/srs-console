@@ -480,9 +480,9 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="vhost.exec">
-            <div class="accordion-heading" sc-collapse="in">
+            <div class="accordion-heading" sc-collapse="false">
                 <a class="accordion-toggle" href="javascript:void(0)">
-                    Vhost Exec, EXEC
+                    Vhost Exec, 执行外部程序
                 </a>
             </div>
             <div class="accordion-body collapse">
@@ -502,6 +502,225 @@
                             <td>vhost.exec.publish</td>
                             <td><span title="{{vhost.exec.publish}}">EXEC</span></td>
                             <td>发布流时的EXEC配置。</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group" ng-show="vhost.hls || vhost.http_hooks">
+            <div class="accordion-heading" sc-collapse="false">
+                <a class="accordion-toggle" href="javascript:void(0)">
+                    Vhost HLS, HLS流
+                </a>
+            </div>
+            <div class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <table class="table table-striped table-hover table-bordered">
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr ng-show="vhost.hls.enabled != undefined">
+                            <td>vhost.hls.enabled</td>
+                            <td>{{vhost.hls.enabled| sc_filter_enabled}}</td>
+                            <td>是否支持HLS输出。默认: {{false| sc_filter_enabled}}。</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_fragment">
+                            <td>vhost.hls.hls_fragment</td>
+                            <td>{{vhost.hls.hls_fragment}}</td>
+                            <td>秒。HLS的TS切片的长度。默认: 10。</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_td_ratio">
+                            <td>vhost.hls.hls_td_ratio</td>
+                            <td>{{vhost.hls.hls_td_ratio}}</td>
+                            <td>HLS的#EXT-X-TARGETDURATION的值，为hls_fragment的默认倍数。默认: 1.5。</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_aof_ratio">
+                            <td>vhost.hls.hls_aof_ratio</td>
+                            <td>{{vhost.hls.hls_aof_ratio}}</td>
+                            <td>纯音频的溢出倍数，当TS切片超过溢出时长时就生成切片。默认: 2.0。</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_window">
+                            <td>vhost.hls.hls_window</td>
+                            <td>{{vhost.hls.hls_window}}</td>
+                            <td>秒。HLS的TS切片的窗口，即m3u8中有多少个TS切片。默认: 60。</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_on_error">
+                            <td>vhost.hls.hls_on_error</td>
+                            <td>{{vhost.hls.hls_on_error}}</td>
+                            <td>
+                                错误时，ignore: 忽略并禁用HLS；disconnect: 断开推流连接；
+                                continue: 继续再试。默认: ignore
+                            </td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_storage">
+                            <td>vhost.hls.hls_storage</td>
+                            <td>{{vhost.hls.hls_storage}}</td>
+                            <td>HLS的存储方式，disk: 磁盘；ram: 内存；both: 两者。默认: disk。</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_path">
+                            <td>vhost.hls.hls_path</td>
+                            <td>{{vhost.hls.hls_path}}</td>
+                            <td>HLS的存储目录。默认: ./objs/nginx/html。</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_m3u8_file">
+                            <td>vhost.hls.hls_m3u8_file</td>
+                            <td>{{vhost.hls.hls_m3u8_file}}</td>
+                            <td>m3u8文件模板。默认: [app]/[stream].m3u8</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_ts_file">
+                            <td>vhost.hls.hls_ts_file</td>
+                            <td>{{vhost.hls.hls_ts_file}}</td>
+                            <td>ts文件模板。默认: [app]/[stream]-[seq].ts</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_ts_floor != undefined">
+                            <td>vhost.hls.hls_ts_floor</td>
+                            <td>{{vhost.hls.hls_ts_floor| sc_filter_enabled}}</td>
+                            <td>是否开启TS文件名递增算法。默认: {{false| sc_filter_enabled}}</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_entry_prefix">
+                            <td>vhost.hls.hls_entry_prefix</td>
+                            <td>{{vhost.hls.hls_entry_prefix}}</td>
+                            <td>HLS的TS切片的前缀。</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_mount">
+                            <td>vhost.hls.hls_mount</td>
+                            <td>{{vhost.hls.hls_mount}}</td>
+                            <td>内存HLS的挂载路径，即用户访问路径。默认: [vhost]/[app]/[stream].m3u8</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_acodec">
+                            <td>vhost.hls.hls_acodec</td>
+                            <td>{{vhost.hls.hls_acodec}}</td>
+                            <td>HLS默认的音频编码。默认: aac</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_vcodec">
+                            <td>vhost.hls.hls_vcodec</td>
+                            <td>{{vhost.hls.hls_vcodec}}</td>
+                            <td>HLS默认的视频编码。默认: h264</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_cleanup != undefined">
+                            <td>vhost.hls.hls_cleanup</td>
+                            <td>{{vhost.hls.hls_cleanup| sc_filter_enabled}}</td>
+                            <td>是否清理超过窗口的TS切片。默认: {{true| sc_filter_enabled}}</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_dispose != undefined">
+                            <td>vhost.hls.hls_dispose</td>
+                            <td>{{vhost.hls.hls_dispose}}</td>
+                            <td>秒。HLS没有收到数据时清理的超时时间。0表示禁用。默认: 0</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_nb_notify">
+                            <td>vhost.hls.hls_nb_notify</td>
+                            <td>{{vhost.hls.hls_nb_notify}}</td>
+                            <td>HLS请求on_hls_notify读取内容的最大长度。默认: 64</td>
+                        </tr>
+                        <tr ng-show="vhost.hls.hls_wait_keyframe != undefined">
+                            <td>vhost.hls.hls_wait_keyframe</td>
+                            <td>{{vhost.hls.hls_wait_keyframe| sc_filter_enabled}}</td>
+                            <td>关闭TS切片时是否等待关键帧。默认: {{true| sc_filter_enabled}}</td>
+                        </tr>
+
+                        <tr ng-show="vhost.http_hooks.on_hls">
+                            <td>vhost.http_hooks.on_hls</td>
+                            <td><span title="{{vhost.http_hooks.on_hls}}">hooks</span></td>
+                            <td>当服务器HLS关闭TS切片文件时的回调，支持多个地址，通知系统HLS切片生成了。</td>
+                        </tr>
+                        <tr ng-show="vhost.http_hooks.on_hls_notify">
+                            <td>vhost.http_hooks.on_hls_notify</td>
+                            <td><span title="{{vhost.http_hooks.on_hls_notify}}">hooks</span></td>
+                            <td>当服务器HLS更新流信息(一般是关闭切片)，只支持一个地址，可用来访问CDN做预取。</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group" ng-show="vhost.hds">
+            <div class="accordion-heading" sc-collapse="false">
+                <a class="accordion-toggle" href="javascript:void(0)">
+                    Vhost HDS, HDS流
+                </a>
+            </div>
+            <div class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <table class="table table-striped table-hover table-bordered">
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr ng-show="vhost.hds.enabled != undefined">
+                            <td>vhost.hds.enabled</td>
+                            <td>{{vhost.hds.enabled| sc_filter_enabled}}</td>
+                            <td>是否分发HDS流。默认: {{false| sc_filter_enabled}}。</td>
+                        </tr>
+                        <tr ng-show="vhost.hds.hds_fragment">
+                            <td>vhost.hds.hds_fragment</td>
+                            <td>{{vhost.hds.hds_fragment}}</td>
+                            <td>秒。HDS的f4v切片的长度。默认: 10。</td>
+                        </tr>
+                        <tr ng-show="vhost.hds.hds_window">
+                            <td>vhost.hds.hds_window</td>
+                            <td>{{vhost.hds.hds_window}}</td>
+                            <td>秒。HDS的f4v切片的窗口，即f4m中有多少个f4v切片。默认: 60。</td>
+                        </tr>
+                        <tr ng-show="vhost.hds.hds_path">
+                            <td>vhost.hds.hds_path</td>
+                            <td>{{vhost.hds.hds_path}}</td>
+                            <td>HDS的存储目录。默认: ./objs/nginx/html。</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group" ng-show="vhost.dvr || vhost.http_hooks">
+            <div class="accordion-heading" sc-collapse="false">
+                <a class="accordion-toggle" href="javascript:void(0)">
+                    Vhost DVR, 直播录制
+                </a>
+            </div>
+            <div class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <table class="table table-striped table-hover table-bordered">
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr ng-show="vhost.dvr.enabled != undefined">
+                            <td>vhost.dvr.enabled</td>
+                            <td>{{vhost.dvr.enabled| sc_filter_enabled}}</td>
+                            <td>是否开启直播录制。默认: {{false| sc_filter_enabled}}。</td>
+                        </tr>
+                        <tr ng-show="vhost.dvr.dvr_plan">
+                            <td>vhost.dvr.dvr_plan</td>
+                            <td>{{vhost.dvr.dvr_plan}}</td>
+                            <td>录制计划，session: 按Session；segment: 分段；append: 一个文件。默认: session</td>
+                        </tr>
+                        <tr ng-show="vhost.dvr.dvr_path">
+                            <td>vhost.dvr.dvr_path</td>
+                            <td><span title="{{vhost.dvr.dvr_path}}">PATH</span></td>
+                            <td>录制文件的模板。默认: ./objs/nginx/html/[app]/[stream].[timestamp].flv</td>
+                        </tr>
+                        <tr ng-show="vhost.dvr.dvr_duration">
+                            <td>vhost.dvr.dvr_duration</td>
+                            <td>{{vhost.dvr.dvr_duration}}</td>
+                            <td>秒。segment计划时，录制文件的时长。默认: 30</td>
+                        </tr>
+                        <tr ng-show="vhost.dvr.dvr_wait_keyframe != undefined">
+                            <td>vhost.dvr.dvr_wait_keyframe</td>
+                            <td>{{vhost.dvr.dvr_wait_keyframe| sc_filter_enabled}}</td>
+                            <td>segment计划时，关闭文件时是否等待关键帧。默认: {{true| sc_filter_enabled}}。</td>
+                        </tr>
+                        <tr ng-show="vhost.dvr.time_jitter">
+                            <td>vhost.dvr.time_jitter</td>
+                            <td>{{vhost.dvr.time_jitter}}</td>
+                            <td>时间戳校正算法。full: 完全校正；zero: 零校正；off: 关闭。默认: full</td>
+                        </tr>
+
+                        <tr ng-show="vhost.http_hooks.on_dvr">
+                            <td>vhost.http_hooks.on_dvr</td>
+                            <td><span title="{{vhost.http_hooks.on_dvr}}">hooks</span></td>
+                            <td>当服务器DVR关闭文件时的回调。</td>
                         </tr>
                     </table>
                 </div>
