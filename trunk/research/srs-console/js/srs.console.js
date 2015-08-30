@@ -218,12 +218,7 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
 
         $sc_utility.refresh.refresh_change(function(){
             MSCApi.configs_get(function(data){
-                var global = data.global;
-                for (var key in global.vhosts) {
-                    var vhost = global.vhosts[key];
-                    vhost.name = key;
-                }
-                $scope.global = global;
+                $scope.global = data.global;
                 $scope.support_raw_api = true;
 
                 $sc_utility.refresh.request();
