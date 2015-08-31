@@ -575,6 +575,23 @@ scApp.provider("$sc_utility", function(){
                 var sibling = angular.element(elem[0].nextSibling);
                 return this.find_siblings(sibling, className);
             },
+            array_actual_equals: function(a, b) {
+                // all elements of a in b.
+                for (var i = 0; i < a.length; i++) {
+                    if (!system_array_contains(b, a[i])) {
+                        return false;
+                    }
+                }
+
+                // all elements of b in a.
+                for (i = 0; i < b.length; i++) {
+                    if (!system_array_contains(a, b[i])) {
+                        return false;
+                    }
+                }
+
+                return true;
+            },
             refresh: async_refresh2
         };
     }];
@@ -656,7 +673,7 @@ scApp.directive("scPretty", [function(){
             scd-submit="submit('xxxxxx', global.xxxxxx)">
         </tr>
  */
-scApp.directive("scDirective", [function(){
+scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
     return {
         restrict: 'A',
         scope: {
@@ -746,7 +763,19 @@ scApp.directive("scDirective", [function(){
                     return;
                 }
 
-                $scope.old_value.changed = true;
+                // compare the value.
+                if ($scope.array) {
+                    var nva = nv;
+                    if (typeof nva == "string") {
+                        nva = nva.split(",");
+                    }
+
+                    $scope.old_value.changed = !$sc_utility.array_actual_equals(
+                        $scope.old_value.value, nva
+                    );
+                } else {
+                    $scope.old_value.changed = $scope.old_value.value != nv;
+                }
             });
 
             $scope.$watch("editing", function(nv, ov){
