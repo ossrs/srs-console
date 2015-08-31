@@ -5,7 +5,7 @@
  * depends: jquery1.10
  * https://code.csdn.net/snippets/147103
  * @see: http://blog.csdn.net/win_lin/article/details/17994347
- * v 1.0.11
+ * v 1.0.12
  */
 
 /**
@@ -96,7 +96,7 @@ function system_array_get(arr, elem_or_function) {
 /**
  * to iterate on array.
  * @param arr the array to iterate on.
- * @param pfn the function to apply on it
+ * @param pfn the function to apply on it. return false to break loop.
  * for example,
  *      arr = [10, 15, 20, 30, 20, 40]
  *      system_array_foreach(arr, function(elem, index){
@@ -104,11 +104,45 @@ function system_array_get(arr, elem_or_function) {
  *      });
  */
 function system_array_foreach(arr, pfn) {
+    if (!pfn) {
+        return;
+    }
+
     for (var i = 0; i < arr.length; i++) {
-        if (pfn) {
-            pfn(arr[i], i)
+        if (!pfn(arr[i], i)) {
+            break;
         }
     }
+}
+
+/**
+ * whether the str starts with flag.
+ */
+function system_string_startswith(str, flag) {
+    if (typeof flag == "object" && flag.constructor == Array) {
+        for (var i = 0; i < flag.length; i++) {
+            if (system_string_startswith(str, flag[i])) {
+                return true;
+            }
+        }
+    }
+
+    return str && flag && str.indexOf(flag) == 0;
+}
+
+/**
+ * whether the str ends with flag.
+ */
+function system_string_endswith(str, flag) {
+    if (typeof flag == "object" && flag.constructor == Array) {
+        for (var i = 0; i < flag.length; i++) {
+            if (system_string_endswith(str, flag[i])) {
+                return true;
+            }
+        }
+    }
+
+    return str && flag && str.indexOf(flag) == str.length - flag.length;
 }
 
 /**
@@ -507,7 +541,14 @@ AsyncRefresh2.prototype.initialize = function(pfn, timeout) {
  * stop refresh, the refresh pfn is set to null.
  */
 AsyncRefresh2.prototype.stop = function() {
-    this.refresh_change(null, null);
+    this.__call.__enabled = false;
+}
+/**
+ * restart refresh, use previous config.
+ */
+AsyncRefresh2.prototype.restart = function() {
+    this.__call.__enabled = true;
+    this.request(0);
 }
 /**
  * change refresh pfn, the old pfn will set to disabled.

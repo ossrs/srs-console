@@ -35,7 +35,7 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
         };
         // only show 3 msgs.
         while ($scope.logs.length > 2) {
-            $scope.logs.splice($scope.logs.length - 1, 1);
+            $scope.logs.splice(0, 1);
         }
         $scope.logs.push(log);
     });
@@ -242,15 +242,30 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
 
     $scope.submit = function(key, value){
         //console.log("submit: " + key + "=" + value);
-
         if (key == "global.listen") {
             if (!value) {
                 $sc_utility.log("warn", "raw update global.listen failed, value=" + value);
                 return false;
             }
+        } else if (key == "global.pid") {
+            if (!value) {
+                $sc_utility.log("warn", "raw update global.pid failed, value=" + value);
+                return false;
+            }
 
-            MSCApi.clients_update(key, value);
+            if (!system_string_startswith(value, ['./', '/var', '/tmp'])) {
+                $sc_utility.log("warn", "pid should starts with ./, /var or /tmp");
+                return false;
+            }
+
+            if (!system_string_endswith(value, '.pid')) {
+                $sc_utility.log("warn", "pid should be *.pid");
+                return false;
+            }
         }
+
+        // submit to server.
+        MSCApi.clients_update(key, value, function(data){});
 
         return true;
     };
