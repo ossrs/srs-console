@@ -660,7 +660,9 @@ scApp.provider("$sc_server", [function(){
                 // optional, init the rtmp port.
                 var self = this;
                 MSCApi.configs_get3(function(data){
-                    self.rtmp = data.minimal.listen;
+                    if (data.minimal) {
+                        self.rtmp = data.minimal.listen;
+                    }
                 });
             }
         };

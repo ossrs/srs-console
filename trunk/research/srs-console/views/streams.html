@@ -23,14 +23,14 @@
                         </tr>
                         <tr ng-repeat="stream in streams">
                             <td><a href="#/streams/{{stream.id}}">{{stream.id}}</a></td>
-                            <td>{{stream.name}}</td>
+                            <td>{{stream.name| sc_filter_less}}</td>
                             <td><a href="#/vhosts/{{stream.vhost}}">{{stream.vhost}}</a></td>
                             <td>{{stream.publish.active| sc_filter_has_stream}}</td>
                             <td>{{stream.clients}}人</td>
                             <td>{{stream.kbps.recv_30s| sc_filter_bitrate_k}}</td>
                             <td>{{stream.kbps.send_30s| sc_filter_bitrate_k}}</td>
-                            <td>{{stream.video| sc_filter_video}}</td>
-                            <td>{{stream.audio| sc_filter_audio}}</td>
+                            <td><span ng-if="stream.video">{{stream.video| sc_filter_video}}</span></td>
+                            <td><span ng-if="stream.audio">{{stream.audio| sc_filter_audio}}</span></td>
                             <td>
                                 <a ng-href="{{stream| sc_filter_preview_url}}" target="_blank">预览</a>
                                 <a ng-show="stream.publish.active" ng-click="kickoff(stream)" href="javascript:void(0)">踢流</a>
