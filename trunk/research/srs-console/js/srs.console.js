@@ -274,24 +274,43 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
             /**
              * transform the api data to angularjs perfer, for instance:
                      data.global.listen = ["1935, "1936"];
+                     data.global.http_api.listen = "1985";
              * parsed to:
                      global.listen = {
                         key: 'listen',
                         value: ["1935", "1936"],
                         error: false
                      }
+                     global.http_api.listen = {
+                        key: 'http_api.listen',
+                        value: "1985",
+                        error: false
+                     }
              * where the error is used for commit error.
              */
-            var global = {};
-            for (var k in data.global) {
-                var v = data.global[k];
+            var object2complex = function(complex, obj, prefix) {
+                for (var k in obj) {
+                    var v = obj[k];
+                    var key = prefix? prefix + "." + k : k;
 
-                global[k] = {
-                    key: system_string_trim(k, 'global.'),
-                    value: v,
-                    error: false
-                };
-            }
+                    if (typeof v == "object" && v.constructor != Array) {
+                        var cv = {};
+                        complex[k] = cv;
+
+                        object2complex(cv, v, key);
+                        continue;
+                    }
+
+                    complex[k] = {
+                        key: system_string_trim(key, 'global.'),
+                        value: v,
+                        error: false
+                    };
+                }
+            };
+            var global = {};
+            object2complex(global, data.global, null);
+            //console.log(global);
 
             $scope.global = global;
             $scope.support_raw_api = true;
