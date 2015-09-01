@@ -87,7 +87,9 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
         $location.path("/connect")
     };
 
-    $sc_server.init($location);
+    // init the server and port for api.
+    $sc_server.init($location, MSCApi);
+
     //$sc_utility.log("trace", "set baseurl to " + $sc_server.baseurl());
 }]);
 
@@ -162,16 +164,27 @@ scApp.controller("CSCStreams", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
         });
     };
 
-    $sc_utility.refresh.refresh_change(function(){
-        MSCApi.streams_get(function(data){
-            $scope.streams = data.streams;
+    MSCApi.vhosts_get(function(data){
+        var vhosts = data.vhosts;
 
-            $sc_utility.refresh.request();
-        });
-    }, 3000);
+        $sc_utility.refresh.refresh_change(function(){
+            MSCApi.streams_get(function(data){
+                for (var k in data.streams) {
+                    var stream = data.streams[k];
+                    stream.owner = system_array_get(vhosts, function(vhost) {return vhost.id == stream.vhost; });
+                }
 
-    $sc_utility.log("trace", "Retrieve streams from SRS");
-    $sc_utility.refresh.request(0);
+                $scope.streams = data.streams;
+
+                $sc_utility.refresh.request();
+            });
+        }, 3000);
+
+        $sc_utility.log("trace", "Retrieve streams from SRS");
+        $sc_utility.refresh.request(0);
+    });
+
+    $sc_utility.log("trace", "Retrieve vhost info from SRS");
 }]);
 
 scApp.controller("CSCStream", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
@@ -186,7 +199,19 @@ scApp.controller("CSCStream", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
     $sc_utility.refresh.stop();
 
     MSCApi.streams_get2($routeParams.id, function(data){
-        $scope.stream = data.stream;
+        var stream = data.stream;
+        if (!$scope.owner) {
+            MSCApi.vhosts_get2(stream.vhost, function(data) {
+                var vhost = data.vhost;
+
+                stream.owner = $scope.owner = vhost;
+                $scope.stream = stream;
+            });
+            $sc_utility.log("trace", "Retrieve vhost info from SRS");
+        } else {
+            stream.owner = $scope.owner;
+            $scope.stream = stream;
+        }
     });
 
     $sc_utility.log("trace", "Retrieve stream info from SRS");
@@ -231,7 +256,7 @@ scApp.controller("CSCClient", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
     $sc_utility.log("trace", "Retrieve client info from SRS");
 }]);
 
-scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
+scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc_utility", "$sc_server", function($scope, $location, MSCApi, $sc_nav, $sc_utility, $sc_server){
     $sc_nav.in_configs();
 
     $sc_utility.refresh.stop();
@@ -306,6 +331,11 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
         MSCApi.clients_update("global." + conf.key, conf.value, function(data){
             $sc_utility.log("trace", "Server accepted, " + conf.key + "=" + conf.value);
             conf.error = false;
+
+            // reload the rtmp service port when port changed.
+            if (conf.key == "listen") {
+                $sc_server.init($location, MSCApi);
+            }
         }, function(){
             conf.error = true;
         });
@@ -365,6 +395,9 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         },
         configs_get2: function(id, success) {
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=vhost&vhost=" + id)).success(success);
+        },
+        configs_get3: function(success) {
+            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=minimal")).success(success);
         },
         clients_update: function(scope, value, success, error) {
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=update&scope=" + scope + "&value=" + value)).success(success).error(error);
@@ -547,6 +580,16 @@ scApp.filter('sc_filter_style_error', function(){
     };
 });
 
+scApp.filter('sc_filter_preview_url', ['$sc_server', function($sc_server){
+    return function(v){
+        var page = "http://ossrs.net/players/srs_player.html";
+        var rtmp = $sc_server.rtmp[$sc_server.rtmp.length - 1];
+        var query = "vhost=" + v.owner.name + "&app=" + v.app + "&stream=" + v.name;
+        query += "&server=" + $sc_server.host +"&port=" + rtmp + "&autostart=true";
+        return v? page+"?" + query:"javascript:void(0)";
+    };
+}]);
+
 // the sc nav is the nevigator
 scApp.provider("$sc_nav", function(){
     this.$get = function(){
@@ -581,12 +624,13 @@ scApp.provider("$sc_nav", function(){
 });
 
 // the sc server is the server we connected to.
-scApp.provider("$sc_server", function(){
+scApp.provider("$sc_server", [function(){
     this.$get = function(){
         return {
             schema: "http",
             host: null,
             port: 1985,
+            rtmp: [1935],
             baseurl: function(){
                 return this.schema + "://" + this.host + (this.port == 80? "": ":" + this.port);
             },
@@ -599,7 +643,7 @@ scApp.provider("$sc_server", function(){
             jsonp_query: function(url, query){
                 return this.baseurl() + url + "?callback=JSON_CALLBACK&" + query;
             },
-            init: function($location) {
+            init: function($location, MSCApi) {
                 // query string then url.
                 if ($location.search().host) {
                     this.host = $location.search().host;
@@ -612,10 +656,16 @@ scApp.provider("$sc_server", function(){
                 } else {
                     this.port = $location.port();
                 }
+
+                // optional, init the rtmp port.
+                var self = this;
+                MSCApi.configs_get3(function(data){
+                    self.rtmp = data.minimal.listen;
+                });
             }
         };
     };
-});
+}]);
 
 // the sc utility is a set of helper utilities.
 scApp.provider("$sc_utility", function(){
@@ -835,14 +885,14 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
 
                 // save the old value.
                 if (!$scope.old_data.init) {
-                    $scope.old_data.value = $scope.data? $scope.data.value:undefined;
+                    $scope.old_data.value = $scope.data.value;
                     $scope.old_data.init = true;
                 }
 
                 // start editing.
                 if (nv && !ov) {
                     // for array, array to string.
-                    if ($scope.array == "true" && $scope.data && $scope.data.value) {
+                    if ($scope.array == "true") {
                         $scope.data.value = $scope.data.value.join(",");
                     }
                 }

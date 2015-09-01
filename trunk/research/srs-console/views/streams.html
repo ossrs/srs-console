@@ -32,6 +32,7 @@
                             <td>{{stream.video| sc_filter_video}}</td>
                             <td>{{stream.audio| sc_filter_audio}}</td>
                             <td>
+                                <a ng-href="{{stream| sc_filter_preview_url}}" target="_blank">预览</a>
                                 <a ng-show="stream.publish.active" ng-click="kickoff(stream)" href="javascript:void(0)">踢流</a>
                             </td>
                         </tr>

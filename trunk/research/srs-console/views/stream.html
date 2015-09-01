@@ -7,7 +7,7 @@
                 </a>
             </div>
             <div id="collapseOne" class="accordion-body collapse in">
-                <div class="accordion-inner">
+                <div class="accordion-inner" ng-if="stream">
                     <p>ID: {{stream.id}}</p>
                     <p>Name: {{stream.name}}</p>
                     <p>Vhost: <a href="#/vhosts/{{stream.vhost}}">{{stream.vhost}}</a></p>
@@ -17,6 +17,7 @@
                     <p>Send: {{stream.kbps.send_30s| sc_filter_bitrate_k}}</p>
                     <p>Video: {{stream.video| sc_filter_video}}</p>
                     <p>Audio: {{stream.audio| sc_filter_audio}}</p>
+                    <p>管理:  <a ng-href="{{stream| sc_filter_preview_url}}" target="_blank">预览</a></p>
                     <p ng-show="stream.publish.active">管理: <a ng-click="kickoff(stream)" href="javascript:void(0)">踢流</a></p>
                 </div>
             </div>
