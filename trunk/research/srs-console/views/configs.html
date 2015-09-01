@@ -362,7 +362,7 @@
         <div class="accordion-group" ng-show="support_raw_api">
             <div class="accordion-heading" sc-collapse="in">
                 <a class="accordion-toggle" href="javascript:void(0)">
-                    虚拟主机(Vhosts)列表, 共配置有{{global.nb_vhosts}}个Vhost
+                    虚拟主机(Vhosts)列表, 共配置有{{global.nb_vhosts.value}}个Vhost
                 </a>
             </div>
             <div class="accordion-body collapse">
@@ -394,7 +394,7 @@
                             <th>采集</th>
                             <th>Opt</th>
                         </tr>
-                        <tr ng-repeat="vhost in global.vhosts">
+                        <tr ng-repeat="vhost in global.vhosts.value">
                             <td><a href="#/vhosts/{{vhost.id}}" ng-show="vhost.id">{{vhost.id}}</a><span ng-show="!vhost.id">无流</span> </td>
                             <td>{{vhost.name}}</td>
                             <td>{{vhost.origin| sc_filter_yn}}</td>
