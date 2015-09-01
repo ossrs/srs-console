@@ -302,7 +302,7 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
     });
 
     $scope.submit = function(conf) {
-        if (false) {
+        if (true) {
             if (conf.key == "listen") {
                 if (!conf.value) {
                     $sc_utility.log("warn", "raw update global.listen failed, value=" + conf.value);
@@ -323,12 +323,17 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
                     $sc_utility.log("warn", "pid should be *.pid");
                     return false;
                 }
+            } else if (conf.key == "chunk_size") {
+                if (!conf.value || parseInt(conf.value) < 128 || parseInt(conf.value) > 65535) {
+                    $sc_utility.log("warn", "raw update chunk_size failed, value=" + conf.value);
+                    return false;
+                }
             }
         }
 
         // submit to server.
         $sc_utility.log("trace", "Submit to server ok, " + conf.key + "=" + conf.value);
-        MSCApi.clients_update("global." + conf.key, conf.value, function(data){
+        MSCApi.clients_update(conf.key, conf.value, function(data){
             $sc_utility.log("trace", "Server accepted, " + conf.key + "=" + conf.value);
             conf.error = false;
 
