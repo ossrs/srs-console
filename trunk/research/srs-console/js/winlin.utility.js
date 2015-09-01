@@ -127,7 +127,7 @@ function system_string_startswith(str, flag) {
         }
     }
 
-    return str && flag && str.indexOf(flag) == 0;
+    return str && flag && str.length >= flag.length && str.indexOf(flag) == 0;
 }
 
 /**
@@ -142,7 +142,27 @@ function system_string_endswith(str, flag) {
         }
     }
 
-    return str && flag && str.indexOf(flag) == str.length - flag.length;
+    return str && flag && str.length >= flag.length && str.indexOf(flag) == str.length - flag.length;
+}
+
+/**
+ * trim the start and end of flag in str.
+ * @param flag a string to trim.
+ */
+function system_string_trim(str, flag) {
+    if (!flag || !flag.length || typeof flag != "string") {
+        return str;
+    }
+
+    while (system_string_startswith(str, flag)) {
+        str = str.substr(flag.length);
+    }
+
+    while (system_string_endswith(str, flag)) {
+        str = str.substr(0, str.length - flag.length);
+    }
+
+    return str;
 }
 
 /**

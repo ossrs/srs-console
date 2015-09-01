@@ -48,6 +48,16 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
             } else {
                 response = "HTTP/" + status + ", " + response;
             }
+        } else {
+            var map = {
+                1062: "服务器不允许这个操作",
+                1063: "RawApi参数不符合要求"
+            };
+            if (map[response.code]) {
+                response = "code=" + response.code + ", " + map[response.code];
+            } else {
+                resonse = "code=" + response.code + ", 系统错误";
+            }
         }
 
         $sc_utility.log("warn", response);
@@ -227,45 +237,78 @@ scApp.controller("CSCConfigs", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
     $sc_utility.refresh.stop();
 
     $scope.support_raw_api = false;
+
     MSCApi.configs_raw(function(data){
         $scope.http_api = data.http_api;
         if (!data.http_api || !data.http_api.enabled || !data.http_api.raw_api || !data.http_api.raw_api.enabled) {
+            $scope.warn_raw_api = $sc_utility.const_raw_api_not_supported;
             return;
         }
 
         MSCApi.configs_get(function(data){
-            $scope.global = data.global;
+            /**
+             * transform the api data to angularjs perfer, for instance:
+                     data.global.listen = ["1935, "1936"];
+             * parsed to:
+                     global.listen = {
+                        key: 'listen',
+                        value: ["1935", "1936"],
+                        error: false
+                     }
+             * where the error is used for commit error.
+             */
+            var global = {};
+            for (var k in data.global) {
+                var v = data.global[k];
+
+                global[k] = {
+                    key: system_string_trim(k, 'global.'),
+                    value: v,
+                    error: false
+                };
+            }
+
+            $scope.global = global;
             $scope.support_raw_api = true;
             //console.log(data);
         });
+    }, function(data){
+        $scope.warn_raw_api = $sc_utility.const_raw_api_not_supported;
     });
 
-    $scope.submit = function(key, value){
-        //console.log("submit: " + key + "=" + value);
-        if (key == "global.listen") {
-            if (!value) {
-                $sc_utility.log("warn", "raw update global.listen failed, value=" + value);
-                return false;
-            }
-        } else if (key == "global.pid") {
-            if (!value) {
-                $sc_utility.log("warn", "raw update global.pid failed, value=" + value);
-                return false;
-            }
+    $scope.submit = function(conf) {
+        if (false) {
+            if (conf.key == "listen") {
+                if (!conf.value) {
+                    $sc_utility.log("warn", "raw update global.listen failed, value=" + conf.value);
+                    return false;
+                }
+            } else if (conf.key == "pid") {
+                if (!conf.value) {
+                    $sc_utility.log("warn", "raw update global.pid failed, value=" + conf.value);
+                    return false;
+                }
 
-            if (!system_string_startswith(value, ['./', '/var', '/tmp'])) {
-                $sc_utility.log("warn", "pid should starts with ./, /var or /tmp");
-                return false;
-            }
+                if (!system_string_startswith(conf.value, ['./', '/var', '/tmp'])) {
+                    $sc_utility.log("warn", "pid should starts with ./, /var or /tmp");
+                    return false;
+                }
 
-            if (!system_string_endswith(value, '.pid')) {
-                $sc_utility.log("warn", "pid should be *.pid");
-                return false;
+                if (!system_string_endswith(conf.value, '.pid')) {
+                    $sc_utility.log("warn", "pid should be *.pid");
+                    return false;
+                }
             }
         }
 
         // submit to server.
-        MSCApi.clients_update(key, value, function(data){});
+        $sc_utility.log("trace", "Submit to server ok, " + conf.key + "=" + conf.value);
+        MSCApi.clients_update("global." + conf.key, conf.value, function(data){
+            $sc_utility.log("trace", "Server accepted, " + conf.key + "=" + conf.value);
+            conf.error = false;
+        }, function(){
+            conf.error = true;
+        });
 
         return true;
     };
@@ -314,8 +357,8 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         clients_delete: function(id, success) {
             $http.jsonp($sc_server.jsonp_delete("/api/v1/clients/" + id)).success(success);
         },
-        configs_raw: function(success) {
-            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=raw")).success(success);
+        configs_raw: function(success, error) {
+            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=raw")).success(success).error(error);
         },
         configs_get: function(success) {
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=global")).success(success);
@@ -323,8 +366,8 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
         configs_get2: function(id, success) {
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=vhost&vhost=" + id)).success(success);
         },
-        clients_update: function(scope, value, success) {
-            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=update&scope=" + scope + "&value=" + value)).success(success);
+        clients_update: function(scope, value, success, error) {
+            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=update&scope=" + scope + "&value=" + value)).success(success).error(error);
         }
     };
 }]);
@@ -498,6 +541,12 @@ scApp.filter("sc_filter_security", function(){
     }
 });
 
+scApp.filter('sc_filter_style_error', function(){
+    return function(v){
+        return v? 'alert-danger':'';
+    };
+});
+
 // the sc nav is the nevigator
 scApp.provider("$sc_nav", function(){
     this.$get = function(){
@@ -607,7 +656,8 @@ scApp.provider("$sc_utility", function(){
 
                 return true;
             },
-            refresh: async_refresh2
+            refresh: async_refresh2,
+            const_raw_api_not_supported: "该服务器不支持HTTP RAW API，或者配置中禁用了该功能。"
         };
     }];
 });
@@ -680,20 +730,23 @@ scApp.directive("scPretty", [function(){
 // sc-directive: scDirective
 /**
  * Usage:
-        <tr sc-directive scd-key="xxxxxx" scd-value="global.xxxxxx" scd-span="span3"
-            scd-desc="xxxxxx"
-            scd-default="xxxxxx"
-            scd-array="true"
-            scd-bool="true"
-            scd-submit="submit('xxxxxx', global.xxxxxx)">
-        </tr>
+         <tr sc-directive scd-data="obj"
+             scd-desc="侦听的端口" scd-default="1935" scd-span="span3"
+             scd-array="true" scd-bool="true" scd-select="1935,1936,1937"
+             scd-submit="submit(obj)">
+         </tr>
+ * where obj is:
+         {
+             key: "listen",
+             value: ["1935", "1936"],
+             error: false
+         }
  */
 scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
     return {
         restrict: 'A',
         scope: {
-            key: '@scdKey',
-            value: '=scdValue',
+            data: '=scdData',
             desc: '@scdDesc',
             submit: '&scdSubmit',
             span: '@scdSpan',
@@ -707,13 +760,11 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
             $scope.editing = false;
 
             // previous old value, for cancel and array value.
-            $scope.old_value = {
+            $scope.old_data = {
                 init: false,
-                changed: false,
                 value: undefined,
                 reset: function(){
                     this.init = false;
-                    this.changed = false;
                     this.value = undefined;
                 }
             };
@@ -729,69 +780,43 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
 
             $scope.commit = function() {
                 // for array, string to array.
-                if ($scope.array == "true" && $scope.value) {
-                    $scope.value = $scope.value.split(",");
+                if ($scope.array == "true" && typeof $scope.data.value == "string") {
+                    $scope.data.value = $scope.data.value.split(",");
                 }
 
-                if ($scope.old_value.init && $scope.old_value.changed) {
-                    if (!$scope.submit()) {
-                        return;
-                    }
+                if ($scope.old_data.init && !$scope.submit()) {
+                    return;
                 }
 
                 $scope.editing = false;
-                $scope.old_value.reset();
+                $scope.old_data.reset();
             };
 
             $scope.load_default = function(){
                 if ($scope.default != undefined) {
-                    if ($scope.bool) {
-                        $scope.value = $scope.default == "true";
+                    if ($scope.bool == "true") {
+                        $scope.data.value = $scope.default == "true";
+                    } else if ($scope.array == "true") {
+                        $scope.data.value = $scope.default.split(",");
                     } else {
-                        $scope.value = $scope.default;
+                        $scope.data.value = $scope.default;
                     }
                 }
             };
 
             $scope.cancel = function() {
-                if ($scope.old_value.init) {
-                    $scope.value = $scope.old_value.value;
+                if ($scope.old_data.init) {
+                    $scope.data.value = $scope.old_data.value;
                 }
 
                 // for array, always restore it when cancel.
                 if ($scope.array == "true") {
-                    $scope.value = $scope.old_value.value;
+                    $scope.data.value = $scope.old_data.value;
                 }
 
                 $scope.editing = false;
-                $scope.old_value.reset();
+                $scope.old_data.reset();
             };
-
-            $scope.$watch("value", function(nv, ov){
-                // not editing.
-                if (!$scope.old_value.init) {
-                    return;
-                }
-
-                // not changed.
-                if (nv == ov) {
-                    return;
-                }
-
-                // compare the value.
-                if ($scope.array) {
-                    var nva = nv;
-                    if (typeof nva == "string") {
-                        nva = nva.split(",");
-                    }
-
-                    $scope.old_value.changed = !$sc_utility.array_actual_equals(
-                        $scope.old_value.value, nva
-                    );
-                } else {
-                    $scope.old_value.changed = $scope.old_value.value != nv;
-                }
-            });
 
             $scope.$watch("editing", function(nv, ov){
                 // init, ignore.
@@ -799,45 +824,57 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
                     return;
                 }
 
+                // when server not set this option, the whole data is undefined.
+                if (!$scope.data) {
+                    $scope.data = {
+                        key: $scope.key,
+                        value: undefined,
+                        error: false
+                    };
+                }
+
                 // save the old value.
-                if (!$scope.old_value.init) {
-                    $scope.old_value.value = $scope.value;
-                    $scope.old_value.init = true;
+                if (!$scope.old_data.init) {
+                    $scope.old_data.value = $scope.data? $scope.data.value:undefined;
+                    $scope.old_data.init = true;
                 }
 
                 // start editing.
                 if (nv && !ov) {
                     // for array, array to string.
-                    if ($scope.array == "true") {
-                        $scope.value = $scope.value.join(",");
+                    if ($scope.array == "true" && $scope.data && $scope.data.value) {
+                        $scope.data.value = $scope.data.value.join(",");
                     }
                 }
-
-                //console.log($scope.value);
             });
         }],
         template: ''
-            + '<td>{{key}}</td>'
-            + '<td colspan="{{editing? 2:0}}" title="{{value}}">'
-                + '<div class="form-inline">'
-                    + '<span class="{{value == undefined?\'label\':\'\'}}" ng-show="!editing">'
-                        + '<span ng-show="bool && value != undefined">{{value| sc_filter_enabled}}</span>'
-                        + '<span ng-show="!bool || value == undefined">{{value| sc_filter_obj| sc_filter_less}}</span>'
-                    + '</span> '
-                    + '<input type="text" class="{{span}} inline" ng-show="editing && !bool && !select" ng-model="value"> '
-                    + '<label class="checkbox" ng-show="editing && bool"><input type="checkbox" ng-model="value">开启</label> '
-                    + '<select ng-model="value" ng-options="s as s for s in selects" ng-show="editing && select"></select>'
-                    + '<a href="javascript:void(0)" ng-click="load_default()" ng-show="editing && default != undefined" title="使用默认值">使用默认值</a> '
-                + '</div>'
-                + '<div ng-show="editing">{{desc}}</div>'
-            + '</td>'
-            + '<td ng-show="!editing">{{desc}}</td>'
-            + '<td class="span1">'
-                + '<a href="javascript:void(0)" ng-click="edit()" ng-show="!editing" title="修改">修改</a> '
-                + '<a href="javascript:void(0)" ng-click="commit()" ng-show="editing && old_value.changed" title="提交">提交</a> '
-                + '<a href="javascript:void(0)" ng-click="cancel()" ng-show="editing" title="取消">放弃</a> '
-            + '</td>',
+        + '<td class="{{data.error| sc_filter_style_error}}">'
+            + '{{key}}'
+        + '</td>'
+        + '<td colspan="{{editing? 2:0}}" title="{{data.value}}" class="{{data.error| sc_filter_style_error}}">'
+            + '<div class="form-inline">'
+                + '<span class="{{!data.error && data.value == undefined?\'label\':\'\'}}" ng-show="!editing">'
+                    + '<span ng-show="bool == \'true\' && data.value != undefined">{{data.value| sc_filter_enabled}}</span>'
+                    + '<span ng-show="bool != \'true\' || data.value == undefined">{{data.value| sc_filter_obj| sc_filter_less}}</span>'
+                + '</span> '
+                + '<input type="text" class="{{span}} inline" ng-show="editing && bool != \'true\' && !select" ng-model="data.value"> '
+                + '<label class="checkbox" ng-show="editing && bool == \'true\'"><input type="checkbox" ng-model="data.value">开启</label> '
+                + '<select ng-model="data.value" ng-options="s as s for s in selects" ng-show="editing && select"></select>'
+                + '<a href="javascript:void(0)" ng-click="load_default()" ng-show="editing && default != undefined" title="使用默认值">使用默认值</a> '
+            + '</div>'
+            + '<div ng-show="editing">{{desc}}</div>'
+        + '</td>'
+        + '<td ng-show="!editing" class="{{data.error| sc_filter_style_error}}">'
+            + '{{desc}}'
+        + '</td>'
+        + '<td class="span1 {{data.error| sc_filter_style_error}}">'
+            + '<a href="javascript:void(0)" ng-click="edit()" ng-show="!editing" title="修改">修改</a> '
+            + '<a href="javascript:void(0)" ng-click="commit()" ng-show="editing" title="提交">提交</a> '
+            + '<a href="javascript:void(0)" ng-click="cancel()" ng-show="editing" title="取消">放弃</a> '
+        + '</td>',
         link: function(scope, elem, attrs){
+            scope.key = system_string_trim(attrs.scdData, "global.");
         }
     };
 }]);
@@ -864,13 +901,13 @@ scApp.factory('MHttpInterceptor', ["$q", "$sc_utility", function($q, $sc_utility
                 $sc_utility.http_error(response.status, response.data);
                 // the $q.reject, will cause the error function of controller.
                 // @see: https://code.angularjs.org/1.2.0-rc.3/docs/api/ng.$q
-                return $q.reject(response.data.code);
+                return $q.reject(response);
             }
             return response || $q.when(response);
         },
         'responseError': function(rejection) {
-            code = $sc_utility.http_error(rejection.status, rejection.data);
-            return $q.reject(code);
+            $sc_utility.http_error(rejection.status, rejection.data);
+            return $q.reject(rejection);
         }
     };
 }]);
