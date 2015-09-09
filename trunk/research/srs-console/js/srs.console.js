@@ -321,42 +321,49 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
     });
 
     $scope.submit = function(conf) {
-        if (true) {
-            if (conf.key == "listen") {
-                if (!conf.value) {
-                    $sc_utility.log("warn", "raw update global.listen failed, value=" + conf.value);
-                    return false;
-                }
-            } else if (conf.key == "pid") {
-                if (!conf.value) {
-                    $sc_utility.log("warn", "raw update global.pid failed, value=" + conf.value);
-                    return false;
-                }
+        if (typeof conf.value != "boolean" && !conf.value) {
+            $sc_utility.log("warn", "global." + conf.key + " should not be empty");
+            return false;
+        }
 
-                if (!system_string_startswith(conf.value, ['./', '/var/', '/tmp/'])) {
-                    $sc_utility.log("warn", "pid should starts with ./, /var/ or /tmp/");
-                    return false;
-                }
-
-                if (!system_string_endswith(conf.value, '.pid')) {
-                    $sc_utility.log("warn", "pid should be *.pid");
-                    return false;
-                }
-            } else if (conf.key == "chunk_size") {
-                if (!conf.value || parseInt(conf.value) < 128 || parseInt(conf.value) > 65535) {
-                    $sc_utility.log("warn", "raw update chunk_size failed, value=" + conf.value);
-                    return false;
-                }
-            } else if (false && conf.key == "ff_log_dir") {
-                if (!conf.value) {
-                    $sc_utility.log("warn", "ff_log_dir should not be empty");
-                    return false;
-                }
-
-                if (conf.value != '/dev/null' && !system_string_startswith(conf.value, ['/var/', '/tmp/', './'])) {
-                    $sc_utility.log("warn", "ff_log_dir should be /dev/null or in ./, /var/ or /tmp/");
-                    return false;
-                }
+        var v = conf.value;
+        if (conf.key == "pid") {
+            if (!system_string_startswith(v, ['./', '/var/', '/tmp/'])) {
+                $sc_utility.log("warn", "pid should starts with ./, /var/ or /tmp/");
+                return false;
+            }
+            if (!system_string_endswith(v, '.pid')) {
+                $sc_utility.log("warn", "pid should be *.pid");
+                return false;
+            }
+        } else if (conf.key == "chunk_size") {
+            if (parseInt(v) < 128 || parseInt(v) > 65535) {
+                $sc_utility.log("warn", "raw update chunk_size failed, value=" + v);
+                return false;
+            }
+        } else if (conf.key == "ff_log_dir") {
+            if (v != '/dev/null' && !system_string_startswith(v, ['/var/', '/tmp/', './'])) {
+                $sc_utility.log("warn", "ff_log_dir should be /dev/null or in ./, /var/ or /tmp/");
+                return false;
+            }
+        } else if (conf.key == "srs_log_tank") {
+            if (v != "file" && v != "console") {
+                $sc_utility.log("warn", "srs_log_tank should be file or console");
+                return false;
+            }
+        } else if (conf.key == "srs_log_level") {
+            if (v != "verbose" && v != "info" && v != "trace" && v != "warn" && v != "error") {
+                $sc_utility.log("warn", "srs_log_level should be verbose, info, trace, warn, error");
+                return false;
+            }
+        } else if (conf.key == "srs_log_file") {
+            if (!system_string_startswith(v, ['./', '/var/', '/tmp/'])) {
+                $sc_utility.log("warn", "srs_log_file should be in ./, /var/ or /tmp/");
+                return false;
+            }
+            if (!system_string_endswith(v, '.log')) {
+                $sc_utility.log("warn", "srs_log_file should be *.log");
+                return false;
             }
         }
 

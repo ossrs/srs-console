@@ -107,14 +107,14 @@
                             </tr>
                             <tr sc-directive scd-data="global.srs_log_level" scd-span="span3"
                                 scd-desc="系统的日志级别，低于该级别的日志不会打印。默认: trace"
-                                scd-default="trace"
+                                scd-default="trace" scd-select="verbose,info,trace,warn,error"
                                 scd-submit="submit(global.srs_log_level)">
                             </tr>
                             <tr sc-directive scd-data="global.srs_log_file" scd-span="span4"
-                                scd-desc="srs_log_file"
+                                scd-desc="当日志容器为file，即日志写入文件时，日志文件的路径。默认: ./objs/srs.log"
                                 scd-default="./objs/srs.log"
                                 scd-submit="submit(global.srs_log_file)"
-                                ng-show="global.srs_log_tank == 'file'">
+                                ng-show="global.srs_log_tank.value == 'file'">
                             </tr>
                             <tr sc-directive scd-data="global.max_connections" scd-span="span3"
                                 scd-desc="系统的最大连接数，超过后将拒绝新连接。默认: 1000"
@@ -226,21 +226,25 @@
                         <tr sc-directive scd-data="global.heartbeat.interval" scd-span="span3"
                             scd-desc="心跳间隔的时间，单位: 秒。默认: 9.9"
                             scd-default="9.9"
-                            scd-submit="submit(global.heartbeat.interval)">
+                            scd-submit="submit(global.heartbeat.interval)"
+                            ng-show="global.heartbeat.enabled.value">
                         </tr>
                         <tr sc-directive scd-data="global.heartbeat.url" scd-span="span5"
                             scd-desc="汇报的HTTP服务器地址，汇报信息格式是JSON。默认: http://127.0.0.1:8085/api/v1/servers"
                             scd-default="http://127.0.0.1:8085/api/v1/servers"
-                            scd-submit="submit(global.heartbeat.url)">
+                            scd-submit="submit(global.heartbeat.url)"
+                            ng-show="global.heartbeat.enabled.value">
                         </tr>
                         <tr sc-directive scd-data="global.heartbeat.device_id" scd-span="span5"
                             scd-desc="设备ID，SRS会写入汇报信息中。"
-                            scd-submit="submit(global.heartbeat.device_id)">
+                            scd-submit="submit(global.heartbeat.device_id)"
+                            ng-show="global.heartbeat.enabled.value">
                         </tr>
                         <tr sc-directive scd-data="global.heartbeat.smmaries" scd-span="span3"
                             scd-desc="是否汇报摘要，即服务器的summaries信息。默认: {{false| sc_filter_yesno}}"
                             scd-default="false" scd-bool="true"
-                        scd-submit="submit(global.heartbeat.summaries)">
+                        scd-submit="submit(global.heartbeat.summaries)"
+                            ng-show="global.heartbeat.enabled.value">
                         </tr>
                     </table>
                 </div>
@@ -298,12 +302,14 @@
                         <tr sc-directive scd-data="global.http_server.listen" scd-span="span3"
                             scd-desc="HTTP服务器侦听的地址，格式是&lt;[address:]port&gt;。默认: 8080"
                             scd-default="8080"
-                            scd-submit="submit(global.http_server.listen)">
+                            scd-submit="submit(global.http_server.listen)"
+                            ng-show="global.http_server.enabled.value">
                         </tr>
                         <tr sc-directive scd-data="global.http_server.dir" scd-span="span5"
                             scd-desc="HTTP服务器的主目录。默认: ./objs/nginx/html"
                             scd-default="./objs/nginx/html"
-                            scd-submit="submit(global.http_server.dir)">
+                            scd-submit="submit(global.http_server.dir)"
+                            ng-show="global.http_server.enabled.value">
                         </tr>
                     </table>
                 </div>
@@ -333,27 +339,27 @@
                             scd-desc="转换器的类型，不同的类型需要不同的配置，mpegts_over_udp,rtsp,flv"
                             scd-select="mpegts_over_udp,rtsp,flv"
                             scd-submit="submit(global.stream_caster.caster)"
-                            ng-show="global.stream_caster.enabled">
+                            ng-show="global.stream_caster.enabled.value">
                         </tr>
                         <tr sc-directive scd-data="global.stream_caster.output" scd-span="span5"
                             scd-desc="输出的RTMP地址，转换器侦听端口，接收特定的流，转换成RTMP后送到SRS。"
                             scd-submit="submit(global.stream_caster.output)"
-                            ng-show="global.stream_caster.enabled">
+                            ng-show="global.stream_caster.enabled.value">
                         </tr>
                         <tr sc-directive scd-data="global.stream_caster.listen" scd-span="span3"
                             scd-desc="转换器侦听的地址，格式是&lt;port&gt;"
                             scd-submit="submit(global.stream_caster.listen)"
-                            ng-show="global.stream_caster.enabled">
+                            ng-show="global.stream_caster.enabled.value">
                         </tr>
                         <tr sc-directive scd-data="global.stream_caster.rtp_port_min" scd-span="span3"
                             scd-desc="转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。"
                             scd-submit="submit(global.stream_caster.rtp_port_min)"
-                            ng-show="global.stream_caster.enabled && global.stream_caster.caster == 'rtsp'">
+                            ng-show="global.stream_caster.enabled.value && global.stream_caster.caster.value == 'rtsp'">
                         </tr>
                         <tr sc-directive scd-data="global.stream_caster.rtp_port_max" scd-span="span3"
                             scd-desc="转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。"
                             scd-submit="submit(global.stream_caster.rtp_port_max)"
-                            ng-show="global.stream_caster.enabled && global.stream_caster.caster == 'rtsp'">
+                            ng-show="global.stream_caster.enabled.value && global.stream_caster.caster.value == 'rtsp'">
                         </tr>
                     </table>
                 </div>
