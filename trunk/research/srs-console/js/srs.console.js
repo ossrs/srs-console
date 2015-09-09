@@ -327,7 +327,12 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
         }
 
         var v = conf.value;
-        if (conf.key == "pid") {
+        if (conf.key == "listen") {
+            if (!system_array_foreach(conf.value.split(","), function(e){ return e; })) {
+                $sc_utility.log("warn", "listen should not be empty");
+                return false;
+            }
+        } else if (conf.key == "pid") {
             if (!system_string_startswith(v, ['./', '/var/', '/tmp/'])) {
                 $sc_utility.log("warn", "pid should starts with ./, /var/ or /tmp/");
                 return false;
