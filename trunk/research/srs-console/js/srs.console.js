@@ -333,8 +333,8 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
                     return false;
                 }
 
-                if (!system_string_startswith(conf.value, ['./', '/var', '/tmp'])) {
-                    $sc_utility.log("warn", "pid should starts with ./, /var or /tmp");
+                if (!system_string_startswith(conf.value, ['./', '/var/', '/tmp/'])) {
+                    $sc_utility.log("warn", "pid should starts with ./, /var/ or /tmp/");
                     return false;
                 }
 
@@ -345,6 +345,16 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
             } else if (conf.key == "chunk_size") {
                 if (!conf.value || parseInt(conf.value) < 128 || parseInt(conf.value) > 65535) {
                     $sc_utility.log("warn", "raw update chunk_size failed, value=" + conf.value);
+                    return false;
+                }
+            } else if (false && conf.key == "ff_log_dir") {
+                if (!conf.value) {
+                    $sc_utility.log("warn", "ff_log_dir should not be empty");
+                    return false;
+                }
+
+                if (conf.value != '/dev/null' && !system_string_startswith(conf.value, ['/var/', '/tmp/', './'])) {
+                    $sc_utility.log("warn", "ff_log_dir should be /dev/null or in ./, /var/ or /tmp/");
                     return false;
                 }
             }
