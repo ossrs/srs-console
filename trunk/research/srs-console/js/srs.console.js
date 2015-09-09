@@ -343,7 +343,7 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
             }
         } else if (conf.key == "chunk_size") {
             if (parseInt(v) < 128 || parseInt(v) > 65535) {
-                $sc_utility.log("warn", "raw update chunk_size failed, value=" + v);
+                $sc_utility.log("warn", "chunk_size should in [128, 65535], value=" + v);
                 return false;
             }
         } else if (conf.key == "ff_log_dir") {
@@ -368,6 +368,21 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
             }
             if (!system_string_endswith(v, '.log')) {
                 $sc_utility.log("warn", "srs_log_file should be *.log");
+                return false;
+            }
+        } else if (conf.key == "max_connections") {
+            if (parseInt(v) < 10 || parseInt(v) > 65535) {
+                $sc_utility.log("warn", "max_connections should in [10, 65535], value=" + v);
+                return false;
+            }
+        } else if (conf.key == "utc_time") {
+            if (v == undefined) {
+                $sc_utility.log("warn", "utc_time invalid");
+                return false;
+            }
+        } else if (conf.key == "pithy_print_ms") {
+            if (parseInt(v) < 100 || parseInt(v) > 300000) {
+                $sc_utility.log("warn", "pithy_print_ms invalid");
                 return false;
             }
         }

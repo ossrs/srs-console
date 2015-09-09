@@ -129,12 +129,12 @@
                             </tr>
                             <tr sc-directive scd-data="global.utc_time" scd-span="span4"
                                 scd-desc="是否启用UTC时间格式，影响日志的时间和路径中包含时间变量的配置。默认: {{false| sc_filter_yesno}}"
-                                scd-default="false"
+                                scd-default="false" scd-bool="true"
                                 scd-submit="submit(global.utc_time)">
                             </tr>
                             <tr sc-directive scd-data="global.pithy_print_ms" scd-span="span3"
                                 scd-desc="简化形式的日志打印间隔，单位: 毫秒。默认: 10000"
-                                scd-default="10000"
+                                scd-default="10000" scd-select="1000,3000,5000,10000,30000"
                                 scd-submit="submit(global.pithy_print_ms)">
                             </tr>
                         </table>
