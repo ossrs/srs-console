@@ -28,7 +28,7 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
             }
         }
     }, 3000);
-    // handler system log event, from $sc_log service.
+    // handler system log event, from $sc_utility service.
     $scope.$on("$sc_utility_log", function(event, level, msg){
         var log = {
             level:level, msg:msg, create:new Date().getTime()
@@ -40,7 +40,7 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
         $scope.logs.push(log);
     });
 
-    // handle system error event, from $sc_system_error service.
+    // handle system error event, from $sc_utility service.
     $scope.$on("$sc_utility_http_error", function(event, status, response){
         if (status != 200) {
             if (!status && !response) {
