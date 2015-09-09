@@ -5,7 +5,7 @@
  * depends: jquery1.10
  * https://code.csdn.net/snippets/147103
  * @see: http://blog.csdn.net/win_lin/article/details/17994347
- * v 1.0.12
+ * v 1.0.13
  */
 
 /**
@@ -102,17 +102,20 @@ function system_array_get(arr, elem_or_function) {
  *      system_array_foreach(arr, function(elem, index){
  *          console.log('index=' + index + ',elem=' + elem);
  *      });
+ * @return true when iterate all elems.
  */
 function system_array_foreach(arr, pfn) {
     if (!pfn) {
-        return;
+        return false;
     }
 
     for (var i = 0; i < arr.length; i++) {
         if (!pfn(arr[i], i)) {
-            break;
+            return false;
         }
     }
+
+    return true;
 }
 
 /**

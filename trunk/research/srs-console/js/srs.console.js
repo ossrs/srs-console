@@ -328,7 +328,7 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
 
         var v = conf.value;
         if (conf.key == "listen") {
-            if (!system_array_foreach(conf.value.split(","), function(e){ return e; })) {
+            if (!system_array_foreach(v, function(e){ return e; })) {
                 $sc_utility.log("warn", "listen should not be empty");
                 return false;
             }
