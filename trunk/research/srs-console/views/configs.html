@@ -338,7 +338,7 @@
                             <th>采集</th>
                             <th>Opt</th>
                         </tr>
-                        <tr ng-repeat="vhost in global.vhosts.value">
+                        <tr ng-repeat="vhost in global.vhosts">
                             <td><a href="#/vhosts/{{vhost.id}}" ng-show="vhost.id">{{vhost.id}}</a><span ng-show="!vhost.id">无流</span> </td>
                             <td>{{vhost.name}}</td>
                             <td>{{vhost.origin| sc_filter_yn}}</td>

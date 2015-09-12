@@ -293,6 +293,11 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
                     var v = obj[k];
                     var key = prefix? prefix + "." + k : k;
 
+                    if (key == "vhosts") {
+                        complex[k] = v;
+                        continue;
+                    }
+
                     if (typeof v == "object" && v.constructor != Array) {
                         var cv = {};
                         complex[k] = cv;
@@ -309,6 +314,7 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
                 }
             };
             var global = {};
+            //console.log(data.global);
             object2complex(global, data.global, null);
             //console.log(global);
 
