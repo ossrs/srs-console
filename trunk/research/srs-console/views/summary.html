@@ -8,12 +8,45 @@
             </div>
             <div id="collapseOne" class="accordion-body collapse">
                 <div class="accordion-inner">
-                    <p>Server/{{server.version}}</p>
-                    <p>运行: {{server.srs_uptime| sc_filter_time}}</p>
-                    <p>内存: {{server.mem_kbyte| sc_filter_filesize_k}}/{{system.mem_ram_kbyte| sc_filter_filesize_k}} ({{server.mem_percent| sc_filter_percent}})</p>
-                    <p>CPU: {{server.cpu_percent| sc_filter_percent}} ({{system.cpus_online * 100| sc_filter_percent}})</p>
-                    <p>负载: {{system.load_1m| sc_filter_number}} {{system.load_5m| sc_filter_number}} {{system.load_15m| sc_filter_number}}</p>
-                    <p>IO: {{system.disk_busy_percent| sc_filter_percent}} 读({{system.disk_read_KBps| sc_filter_filerate_k}}) 写({{system.disk_write_KBps| sc_filter_filerate_k}})</p>
+                    <div class="row">
+                        <div class="span3">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td>SRS版本</td>
+                                    <td>{{server.version}}</td>
+                                </tr>
+                                <tr>
+                                    <td>SRS运行</td>
+                                    <td>{{server.srs_uptime| sc_filter_time}}</td>
+                                </tr>
+                                <tr>
+                                    <td>OS运行</td>
+                                    <td>{{system.uptime| sc_filter_time}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="span3">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td>CPU</td>
+                                    <td>{{system.cpu_percent * system.cpus_online| sc_filter_percentf}} / {{system.cpus_online| sc_filter_percentf}}</td>
+                                </tr>
+                                <tr>
+                                    <td>内存</td>
+                                    <td>{{system.mem_ram_kbyte * system.mem_ram_percent| sc_filter_filesize_k}} / {{system.mem_ram_kbyte| sc_filter_filesize_k}}</td>
+                                </tr>
+                                <tr>
+                                    <td>负载</td>
+                                    <td>{{system.load_1m| sc_filter_number}} / {{system.load_5m| sc_filter_number}} / {{system.load_15m| sc_filter_number}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="span3 hide">
+                            <p>内存: {{server.mem_kbyte| sc_filter_filesize_k}}/{{system.mem_ram_kbyte| sc_filter_filesize_k}} ({{server.mem_percent| sc_filter_percent}})</p>
+                            <p>CPU: {{server.cpu_percent| sc_filter_percent}} ({{system.cpus_online * 100| sc_filter_percent}})</p>
+                            <p>IO: {{system.disk_busy_percent| sc_filter_percent}} 读({{system.disk_read_KBps| sc_filter_filerate_k}}) 写({{system.disk_write_KBps| sc_filter_filerate_k}})</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

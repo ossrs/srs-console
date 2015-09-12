@@ -18,47 +18,26 @@
                             <th>Description</th>
                             <th>Opt</th>
                         </tr>
-                        <tr>
-                            <td>http_api.enabled</td>
-                            <td sc-pretty="http_api.enabled" scp-bool="true"></td>
-                            <td>是否开启HTTP API，开启后就可以访问SRS提供的API管理服务器。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty scp-key="http_api.enabled" scp-value="http_api.enabled" scp-bool="true"
+                            scp-desc="是否开启HTTP API，开启后就可以访问SRS提供的API管理服务器。默认: {{false| sc_filter_enabled}}">
                         </tr>
-                        <tr>
-                            <td>http_api.listen</td>
-                            <td sc-pretty="http_api.listen"></td>
-                            <td>HTTP API的侦听地址，格式是&lt;[address:]port&gt;。默认: 1985</td>
-                            <td>修改</td>
+                        <tr sc-pretty scp-key="http_api.listen" scp-value="http_api.listen"
+                            scp-desc="HTTP API的侦听地址，格式是&lt;[address:]port&gt;。默认: 1985">
                         </tr>
-                        <tr>
-                            <td>http_api.crossdomain</td>
-                            <td sc-pretty="http_api.crossdomain" scp-bool="true"></td>
-                            <td>是否允许JS跨域，开启后JS可以直接跨域(还可以通过JSONP访问)。默认: {{true| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty scp-key="http_api.crossdomain" scp-value="http_api.crossdomain" scp-bool="true"
+                            scp-desc="是否允许JS跨域，开启后JS可以直接跨域(还可以通过JSONP访问)。默认: {{true| sc_filter_enabled}}">
                         </tr>
-                        <tr>
-                            <td>http_api.raw_api.enabled</td>
-                            <td sc-pretty="http_api.raw_api.enabled" scp-bool="true"></td>
-                            <td>是否开启HTTP RAW API，允许API修改服务器配置。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty scp-key="http_api.raw_api.enabled" scp-value="http_api.raw_api.enabled" scp-bool="true"
+                            scp-desc="是否开启HTTP RAW API，允许API修改服务器配置。默认: {{false| sc_filter_enabled}}">
                         </tr>
-                        <tr>
-                            <td>http_api.raw_api.allow_reload</td>
-                            <td sc-pretty="http_api.raw_api.allow_reload" scp-bool="true"></td>
-                            <td>是否允许API进行Reload操作。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty scp-key="http_api.raw_api.allow_reload" scp-value="http_api.raw_api.allow_reload" scp-bool="true"
+                            scp-desc="是否允许API进行Reload操作。默认: {{false| sc_filter_enabled}}">
                         </tr>
-                        <tr>
-                            <td>http_api.raw_api.allow_query</td>
-                            <td sc-pretty="http_api.raw_api.allow_query" scp-bool="true"></td>
-                            <td>是否允许API进行Query查询操作。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty scp-key="http_api.raw_api.allow_query" scp-value="http_api.raw_api.allow_query" scp-bool="true"
+                            scp-desc="是否允许API进行Query查询操作。默认: {{false| sc_filter_enabled}}">
                         </tr>
-                        <tr>
-                            <td>http_api.raw_api.allow_update</td>
-                            <td sc-pretty="http_api.raw_api.allow_update" scp-bool="true"></td>
-                            <td>是否允许API进行Update更新操作。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty scp-key="http_api.raw_api.allow_update" scp-value="http_api.raw_api.allow_update" scp-bool="true"
+                            scp-desc="是否允许API进行Update更新操作。默认: {{false| sc_filter_enabled}}">
                         </tr>
                     </table>
                 </div>
@@ -121,11 +100,8 @@
                                 scd-default="1000"
                                 scd-submit="submit(global.max_connections)">
                             </tr>
-                            <tr>
-                                <td>daemon</td>
-                                <td sc-pretty="global.daemon.value" scp-bool="true"></td>
-                                <td>是否以后台启动SRS。默认: {{true| sc_filter_yesno}}</td>
-                                <td>修改</td>
+                            <tr sc-pretty2 scp-data="global.daemon" scp-bool="true"
+                                scp-desc="是否以后台启动SRS。默认: {{true| sc_filter_yesno}}">
                             </tr>
                             <tr sc-directive scd-data="global.utc_time" scd-span="span4"
                                 scd-desc="是否启用UTC时间格式，影响日志的时间和路径中包含时间变量的配置。默认: {{false| sc_filter_yesno}}"
@@ -143,7 +119,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="support_raw_api">
-            <div class="accordion-heading" sc-collapse="in">
+            <div class="accordion-heading" sc-collapse="hide">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器API配置(http_api)
                 </a>
@@ -157,54 +133,36 @@
                             <th>Description</th>
                             <th>Opt</th>
                         </tr>
-                        <tr>
-                            <td>http_api.enabled</td>
-                            <td sc-pretty="global.http_api.enabled.value" scp-bool="true"></td>
-                            <td>是否开启HTTP API，开启后就可以访问SRS提供的API管理服务器。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty2 scp-data="global.daemon" scp-bool="true"
+                            scp-desc="是否以后台启动SRS。默认: {{true| sc_filter_yesno}}">
                         </tr>
-                        <tr>
-                            <td>http_api.listen</td>
-                            <td sc-pretty="global.http_api.listen.value"></td>
-                            <td>HTTP API的侦听地址，格式是&lt;[address:]port&gt;。默认: 1985</td>
-                            <td>修改</td>
+                        <tr sc-pretty2 scp-data="global.http_api.enabled" scp-bool="true"
+                            scp-desc="是否开启HTTP API，开启后就可以访问SRS提供的API管理服务器。默认: {{false| sc_filter_enabled}}">
                         </tr>
-                        <tr>
-                            <td>http_api.crossdomain</td>
-                            <td sc-pretty="global.http_api.crossdomain.value" scp-bool="true"></td>
-                            <td>是否允许JS跨域，开启后JS可以直接跨域(还可以通过JSONP访问)。默认: {{true| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty2 scp-data="global.http_api.listen.value"
+                            scp-desc="HTTP API的侦听地址，格式是&lt;[address:]port&gt;。默认: 1985">
                         </tr>
-                        <tr>
-                            <td>http_api.raw_api.enabled</td>
-                            <td sc-pretty="global.http_api.raw_api.enabled.value" scp-bool="true"></td>
-                            <td>是否开启HTTP RAW API，允许API修改服务器配置。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty2 scp-data="global.http_api.crossdomain" scp-bool="true"
+                            scp-desc="是否允许JS跨域，开启后JS可以直接跨域(还可以通过JSONP访问)。默认: {{true| sc_filter_enabled}}">
                         </tr>
-                        <tr>
-                            <td>http_api.raw_api.allow_reload</td>
-                            <td sc-pretty="global.http_api.raw_api.allow_reload.value" scp-bool="true"></td>
-                            <td>是否允许API进行Reload操作。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty2 scp-data="global.http_api.raw_api.enabled" scp-bool="true"
+                            scp-desc="是否开启HTTP RAW API，允许API修改服务器配置。默认: {{false| sc_filter_enabled}}">
                         </tr>
-                        <tr>
-                            <td>http_api.raw_api.allow_query</td>
-                            <td sc-pretty="global.http_api.raw_api.allow_query.value" scp-bool="true"></td>
-                            <td>是否允许API进行Query查询操作。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty2 scp-data="global.http_api.raw_api.allow_reload" scp-bool="true"
+                            scp-desc="是否允许API进行Reload操作。默认: {{false| sc_filter_enabled}}">
                         </tr>
-                        <tr>
-                            <td>http_api.raw_api.allow_update</td>
-                            <td sc-pretty="global.http_api.raw_api.allow_update.value" scp-bool="true"></td>
-                            <td>是否允许API进行Update更新操作。默认: {{false| sc_filter_enabled}}</td>
-                            <td>修改</td>
+                        <tr sc-pretty2 scp-data="global.http_api.raw_api.allow_query" scp-bool="true"
+                            scp-desc="是否允许API进行Query查询操作。默认: {{false| sc_filter_enabled}}">
+                        </tr>
+                        <tr sc-pretty2 scp-data="global.http_api.raw_api.allow_update" scp-bool="true"
+                            scp-desc="是否允许API进行Update更新操作。默认: {{false| sc_filter_enabled}}">
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
         <div class="accordion-group" ng-show="support_raw_api">
-            <div class="accordion-heading" sc-collapse="in">
+            <div class="accordion-heading" sc-collapse="hide">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器心跳汇报(heartbeat)
                 </a>
@@ -218,31 +176,25 @@
                             <th>Description</th>
                             <th>Opt</th>
                         </tr>
-                        <tr sc-directive scd-data="global.heartbeat.enabled" scd-span="span3"
-                            scd-desc="是否开启服务器心跳，向外部系统汇报。默认: {{false| sc_filter_enabled}}"
-                            scd-default="false" scd-bool="true"
-                            scd-submit="submit(global.heartbeat.enabled)">
+                        <tr sc-pretty2 scp-data="global.heartbeat.enabled"
+                            scp-desc="是否开启服务器心跳，向外部系统汇报。默认: {{false| sc_filter_enabled}}"
+                            scd-bool="true">
                         </tr>
-                        <tr sc-directive scd-data="global.heartbeat.interval" scd-span="span3"
-                            scd-desc="心跳间隔的时间，单位: 秒。默认: 9.9"
-                            scd-default="9.9"
-                            scd-submit="submit(global.heartbeat.interval)"
+                        <tr sc-pretty2 scp-data="global.heartbeat.interval"
+                            scp-desc="心跳间隔的时间，单位: 秒。默认: 9.9"
                             ng-show="global.heartbeat.enabled.value">
                         </tr>
-                        <tr sc-directive scd-data="global.heartbeat.url" scd-span="span5"
-                            scd-desc="汇报的HTTP服务器地址，汇报信息格式是JSON。默认: http://127.0.0.1:8085/api/v1/servers"
-                            scd-default="http://127.0.0.1:8085/api/v1/servers"
-                            scd-submit="submit(global.heartbeat.url)"
+                        <tr sc-pretty2 scp-data="global.heartbeat.url"
+                            scp-desc="汇报的HTTP服务器地址，汇报信息格式是JSON。默认: http://127.0.0.1:8085/api/v1/servers"
                             ng-show="global.heartbeat.enabled.value">
                         </tr>
-                        <tr sc-directive scd-data="global.heartbeat.device_id" scd-span="span5"
-                            scd-desc="设备ID，SRS会写入汇报信息中。"
-                            scd-submit="submit(global.heartbeat.device_id)"
+                        <tr sc-pretty2 scp-data="global.heartbeat.device_id"
+                            scp-desc="设备ID，SRS会写入汇报信息中。"
                             ng-show="global.heartbeat.enabled.value">
                         </tr>
-                        <tr sc-directive scd-data="global.heartbeat.smmaries" scd-span="span3"
-                            scd-desc="是否汇报摘要，即服务器的summaries信息。默认: {{false| sc_filter_yesno}}"
-                            scd-default="false" scd-bool="true"
+                        <tr sc-pretty2 scp-data="global.heartbeat.smmaries"
+                            scp-desc="是否汇报摘要，即服务器的summaries信息。默认: {{false| sc_filter_yesno}}"
+                            scd-bool="true"
                         scd-submit="submit(global.heartbeat.summaries)"
                             ng-show="global.heartbeat.enabled.value">
                         </tr>
@@ -251,7 +203,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="support_raw_api">
-            <div class="accordion-heading" sc-collapse="in">
+            <div class="accordion-heading" sc-collapse="hide">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     服务器统计信息配置(stats)
                 </a>
@@ -265,22 +217,19 @@
                             <th>Description</th>
                             <th>Opt</th>
                         </tr>
-                        <tr sc-directive scd-data="global.stats.network" scd-span="span3"
-                            scd-desc="统计的网卡索引，从0开始算第一块网卡。默认: 0"
-                            scd-default="0"
-                            scd-submit="submit(global.stats.network)">
+                        <tr sc-pretty2 scp-data="global.stats.network"
+                            scp-desc="统计的网卡索引，从0开始算第一块网卡。默认: 0">
                         </tr>
-                        <tr sc-directive scd-data="global.stats.disk" scd-span="span3"
-                            scd-desc="统计的磁盘名称，可以在/proc/diskstats中查看。"
-                            scd-array="true"
-                            scd-submit="submit(global.stats.disk)">
+                        <tr sc-pretty2 scp-data="global.stats.disk"
+                            scp-desc="统计的磁盘名称，可以在/proc/diskstats中查看。"
+                            scd-array="true">
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
         <div class="accordion-group" ng-show="support_raw_api">
-            <div class="accordion-heading" sc-collapse="in">
+            <div class="accordion-heading" sc-collapse="hide">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     HTTP服务器配置(http_server)
                 </a>
@@ -294,21 +243,16 @@
                             <th>Description</th>
                             <th>Opt</th>
                         </tr>
-                        <tr sc-directive scd-data="global.http_server.enabled" scd-span="span3"
-                            scd-desc="是否开启HTTP文件服务器和HTTP流服务器。默认: {{false| sc_filter_enabled}}"
-                            scd-default="false" scd-bool="true"
-                            scd-submit="submit(global.http_server.enabled)">
+                        <tr sc-pretty2 scp-data="global.http_server.enabled"
+                            scp-desc="是否开启HTTP文件服务器和HTTP流服务器。默认: {{false| sc_filter_enabled}}"
+                            scd-bool="true">
                         </tr>
-                        <tr sc-directive scd-data="global.http_server.listen" scd-span="span3"
-                            scd-desc="HTTP服务器侦听的地址，格式是&lt;[address:]port&gt;。默认: 8080"
-                            scd-default="8080"
-                            scd-submit="submit(global.http_server.listen)"
+                        <tr sc-pretty2 scp-data="global.http_server.listen"
+                            scp-desc="HTTP服务器侦听的地址，格式是&lt;[address:]port&gt;。默认: 8080"
                             ng-show="global.http_server.enabled.value">
                         </tr>
-                        <tr sc-directive scd-data="global.http_server.dir" scd-span="span5"
-                            scd-desc="HTTP服务器的主目录。默认: ./objs/nginx/html"
-                            scd-default="./objs/nginx/html"
-                            scd-submit="submit(global.http_server.dir)"
+                        <tr sc-pretty2 scp-data="global.http_server.dir"
+                            scp-desc="HTTP服务器的主目录。默认: ./objs/nginx/html"
                             ng-show="global.http_server.enabled.value">
                         </tr>
                     </table>
@@ -316,7 +260,7 @@
             </div>
         </div>
         <div class="accordion-group" ng-show="support_raw_api">
-            <div class="accordion-heading" sc-collapse="in">
+            <div class="accordion-heading" sc-collapse="hide">
                 <a class="accordion-toggle" href="javascript:void(0)">
                     StreamCaster流转换器(stream_caster)
                 </a>
@@ -330,35 +274,29 @@
                             <th>Description</th>
                             <td>Opt</td>
                         </tr>
-                        <tr sc-directive scd-data="global.stream_caster.enabled" scd-span="span3"
-                            scd-desc="是否开启StreamCaster，即接收特殊的流后转换成RTMP送到SRS。默认: {{false| sc_filter_enabled}}"
-                            scd-default="false" scd-bool="true"
-                            scd-submit="submit(global.stream_caster.enabled)">
+                        <tr sc-pretty2 scp-data="global.stream_caster.enabled"
+                            scp-desc="是否开启StreamCaster，即接收特殊的流后转换成RTMP送到SRS。默认: {{false| sc_filter_enabled}}"
+                            scd-bool="true">
                         </tr>
-                        <tr sc-directive scd-data="global.stream_caster.caster" scd-span="span3"
-                            scd-desc="转换器的类型，不同的类型需要不同的配置，mpegts_over_udp,rtsp,flv"
+                        <tr sc-pretty2 scp-data="global.stream_caster.caster"
+                            scp-desc="转换器的类型，不同的类型需要不同的配置，mpegts_over_udp,rtsp,flv"
                             scd-select="mpegts_over_udp,rtsp,flv"
-                            scd-submit="submit(global.stream_caster.caster)"
                             ng-show="global.stream_caster.enabled.value">
                         </tr>
-                        <tr sc-directive scd-data="global.stream_caster.output" scd-span="span5"
-                            scd-desc="输出的RTMP地址，转换器侦听端口，接收特定的流，转换成RTMP后送到SRS。"
-                            scd-submit="submit(global.stream_caster.output)"
+                        <tr sc-pretty2 scp-data="global.stream_caster.output"
+                            scp-desc="输出的RTMP地址，转换器侦听端口，接收特定的流，转换成RTMP后送到SRS。"
                             ng-show="global.stream_caster.enabled.value">
                         </tr>
-                        <tr sc-directive scd-data="global.stream_caster.listen" scd-span="span3"
-                            scd-desc="转换器侦听的地址，格式是&lt;port&gt;"
-                            scd-submit="submit(global.stream_caster.listen)"
+                        <tr sc-pretty2 scp-data="global.stream_caster.listen"
+                            scp-desc="转换器侦听的地址，格式是&lt;port&gt;"
                             ng-show="global.stream_caster.enabled.value">
                         </tr>
-                        <tr sc-directive scd-data="global.stream_caster.rtp_port_min" scd-span="span3"
-                            scd-desc="转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。"
-                            scd-submit="submit(global.stream_caster.rtp_port_min)"
+                        <tr sc-pretty2 scp-data="global.stream_caster.rtp_port_min"
+                            scp-desc="转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。"
                             ng-show="global.stream_caster.enabled.value && global.stream_caster.caster.value == 'rtsp'">
                         </tr>
-                        <tr sc-directive scd-data="global.stream_caster.rtp_port_max" scd-span="span3"
-                            scd-desc="转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。"
-                            scd-submit="submit(global.stream_caster.rtp_port_max)"
+                        <tr sc-pretty2 scp-data="global.stream_caster.rtp_port_max"
+                            scp-desc="转换器会在[rtp_port_min, rtp_port_max]中间选择一个新端口并侦听，参考RTP协议。"
                             ng-show="global.stream_caster.enabled.value && global.stream_caster.caster.value == 'rtsp'">
                         </tr>
                     </table>

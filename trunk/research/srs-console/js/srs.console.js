@@ -550,6 +550,12 @@ scApp.filter("sc_filter_percent", function(){
     };
 });
 
+scApp.filter("sc_filter_percentf", function(){
+    return function(v){
+        return Number(v * 100).toFixed(2) + "%";
+    };
+});
+
 scApp.filter("sc_filter_enabled", function(){
     return function(v){
         return v? "开启":"关闭";
@@ -818,25 +824,62 @@ scApp.directive('scCollapse', ["$sc_utility", function($sc_utility){
 // sc-pretty: scPretty
 /**
  * Usage:
-        <tr>
-            <td>daemon</td>
-            <td sc-pretty="global.daemon" scp-bool="true"></td>
-            <td>是否以后台启动SRS。默认: {{true| sc_filter_yesno}}</td>
-            <td>修改</td>
-        </tr>
+     <tr sc-pretty scp-key="http_api.enabled" scp-value="http_api.enabled" scp-bool="true"
+        scp-desc="是否开启HTTP API，开启后就可以访问SRS提供的API管理服务器。默认: {{false| sc_filter_enabled}}">
+     </tr>
  */
 scApp.directive("scPretty", [function(){
     return {
         restrict: 'A',
         scope: {
-            data: '=scPretty',
+            key: '@scpKey',
+            value: '=scpValue',
+            desc: '@scpDesc',
             bool: '@scpBool'
         },
         template: ''
-            + '<span class="{{data == undefined? \'label\':\'\'}}">'
-                + '<span ng-show="bool && data != undefined">{{data| sc_filter_enabled}}</span>'
-                + '<span ng-show="!bool || data == undefined">{{data| sc_filter_obj}}</span>'
-            + '</span>'
+            + '<td>{{key}}</td>'
+            + '<td>'
+                + '<span class="{{value == undefined? \'label\':\'\'}}">'
+                    + '<span ng-show="bool && value != undefined">{{value| sc_filter_enabled}}</span>'
+                    + '<span ng-show="!bool || value == undefined">{{value| sc_filter_obj}}</span>'
+                + '</span>'
+            + '</td>'
+            + '<td>{{desc}}</td>'
+            + '<td>只读</td>'
+    };
+}]);
+
+// sc-pretty2: scPretty2
+/**
+ * Usage:
+     <tr sc-pretty2 scp-data="global.daemon" scp-bool="true"
+        scp-desc="是否以后台启动SRS。默认: {{true| sc_filter_yesno}}">
+     </tr>
+ */
+scApp.directive("scPretty2", [function(){
+    return {
+        restrict: 'A',
+        scope: {
+            data: '=scpData',
+            desc: '@scpDesc',
+            bool: '@scpBool'
+        },
+        controller: ['$scope', function($scope){
+        }],
+        template: ''
+            + '<td>{{key}}</td>'
+            + '<td>'
+                + '<span class="{{data.value == undefined? \'label\':\'\'}}">'
+                    + '<span ng-show="bool && data.value != undefined">{{data.value| sc_filter_enabled}}</span>'
+                    + '<span ng-show="!bool || data.value == undefined">{{data.value| sc_filter_obj}}</span>'
+                + '</span>'
+            + '</td>'
+            + '<td>{{desc}}</td>'
+            + '<td>只读</td>',
+        link: function(scope, elem, attrs){
+            scope.key = system_string_trim(attrs.scpData, "global.");
+        }
     };
 }]);
 
