@@ -291,10 +291,11 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
             var object2complex = function(complex, obj, prefix) {
                 for (var k in obj) {
                     var v = obj[k];
-                    var key = prefix? prefix + "." + k : k;
+                    //console.log("k=" + key + ", v=" + typeof v + ", " + v);
 
+                    var key = prefix? prefix + "." + k : k;
                     if (key == "vhosts") {
-                        complex[k] = v;
+                        complex[k] = $sc_utility.object2arr(v);
                         continue;
                     }
 
@@ -304,6 +305,12 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
 
                         object2complex(cv, v, key);
                         continue;
+                    }
+
+                    // convert number to str for select to
+                    // choose the right default one.
+                    if (key == "pithy_print_ms") {
+                        v = String(v);
                     }
 
                     complex[k] = {
@@ -326,6 +333,43 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
         $scope.warn_raw_api = $sc_utility.const_raw_api_not_supported;
     });
 
+    // operate vhost in client.
+    $scope.new_vhost = function() {
+        $scope.global.vhosts.push({
+            editable: true
+        });
+    };
+
+    $scope.edit_vhost = function(vhost) {
+        vhost.editable = true;
+    };
+
+    $scope.cancel_vhost = function(vhost) {
+        vhost.editable = false;
+    };
+
+    $scope.abort_vhost = function(vhost) {
+        system_array_remove($scope.global.vhosts, vhost);
+    };
+
+    // submit vhost to server
+    $scope.update_vhost = function(vhost) {
+        vhost.editable = false;
+    };
+
+    $scope.add_vhost = function(vhost) {
+        vhost.editable = false;
+    };
+
+    $scope.delete_vhost= function(vhost) {
+        system_array_remove($scope.global.vhosts, vhost);
+    };
+
+    $scope.disable_vhost = function(vhost) {
+        vhost.enabled = false;
+    };
+
+    // submit global config to server.
     $scope.submit = function(conf) {
         if (typeof conf.value != "boolean" && !conf.value) {
             $sc_utility.log("warn", "global." + conf.key + " should not be empty");
@@ -781,6 +825,13 @@ scApp.provider("$sc_utility", function(){
 
                 return true;
             },
+            object2arr: function(obj){
+                var arr = [];
+                for (var k in obj) {
+                    arr.push(obj[k]);
+                }
+                return arr;
+            },
             refresh: async_refresh2,
             const_raw_api_not_supported: "该服务器不支持HTTP RAW API，或者配置中禁用了该功能。"
         };
@@ -1032,7 +1083,11 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
         + '</td>'
         + '<td class="span1 {{data.error| sc_filter_style_error}}">'
             + '<a href="javascript:void(0)" ng-click="edit()" ng-show="!editing" title="修改">修改</a> '
-            + '<a href="javascript:void(0)" ng-click="commit()" ng-show="editing" title="提交">提交</a> '
+            + '<a bravo-popover href="javascript:void(0)"'
+                + 'data-content="请确认是否修改?" data-title="请确认" data-placement="left"'
+                + 'bravo-popover-confirm="commit()" ng-show="editing">'
+                    + '提交'
+            + '</a> '
             + '<a href="javascript:void(0)" ng-click="cancel()" ng-show="editing" title="取消">放弃</a> '
         + '</td>',
         link: function(scope, elem, attrs){

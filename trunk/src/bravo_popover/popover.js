@@ -8,10 +8,10 @@ angular.module('bravoUiPopover', [])
                 confirm: '&bravoPopoverConfirm'
             },
             compile: function (elem, attr) {
-                var confirm_template = attr['bravoPopoverConfirm'] ? '<div class="row-fluid">' +
-                            '<button class="span6 btn btn-danger" ng-click="on_confirm()">确定</button>' +
-                            '<button class="span6 btn btn-info" ng-click="on_cancel()">取消</button>' +
-                        '</div>' : '';
+                var confirm_template = attr['bravoPopoverConfirm'] ? '<span>' +
+                            '<a class="btn btn-danger" ng-click="on_confirm()">确定</a> ' +
+                            '<a class="btn btn-info" ng-click="on_cancel()">取消</a>' +
+                        '</span>' : '';
                 var template =
                     '<div class="popover fade {{placement}} in" ng-show="popoover_show == \'in\'">' +
                         '<div class="arrow"></div>' +
@@ -67,7 +67,7 @@ angular.module('bravoUiPopover', [])
                     };
 
                     var render_css = function (scope_element) {
-                        var ttPosition = $position.positionElements(elem, scope_element, scope.placement, true);
+                        var ttPosition = $position.positionElements(elem, scope_element, scope.placement, false);
                         ttPosition.top += 'px';
                         ttPosition.left += 'px';
                         // Now set the calculated positioning.
