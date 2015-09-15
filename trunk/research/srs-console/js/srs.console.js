@@ -295,7 +295,8 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
 
                     var key = prefix? prefix + "." + k : k;
                     if (key == "vhosts") {
-                        complex[k] = $sc_utility.object2arr(v);
+                        // use name as vhost id.
+                        complex[k] = $sc_utility.object2arr(v, function(e) { e.vid = e.name; });
                         continue;
                     }
 
@@ -346,6 +347,7 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
 
     $scope.cancel_vhost = function(vhost) {
         vhost.editable = false;
+        vhost.name = vhost.vid;
     };
 
     $scope.abort_vhost = function(vhost) {
@@ -353,20 +355,59 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
     };
 
     // submit vhost to server
-    $scope.update_vhost = function(vhost) {
-        vhost.editable = false;
+    $scope.add_vhost = function(vhost) {
+        if (system_array_contains($scope.global.vhosts, function(e){ return vhost != e && vhost.name == e.name; })) {
+            $sc_utility.log("warn", "vhost " + vhost.name + "已经存在");
+            return;
+        }
+
+        MSCApi.clients_update2("vhost", vhost.name, "create", function(data){
+            $sc_utility.copy_object(vhost, data.data);
+            vhost.enabled = true;
+            vhost.editable = false;
+
+            $sc_utility.log("trace", "创建vhost成功");
+        });
+
+        $sc_utility.log("trace", "提交vhost到服务器");
     };
 
-    $scope.add_vhost = function(vhost) {
-        vhost.editable = false;
+    $scope.update_vhost = function(vhost) {
+        if (vhost.vid == vhost.name) {
+            $sc_utility.log("warn", "Vhost没有任何改变");
+            return;
+        }
+
+        MSCApi.clients_update3("vhost", vhost.vid, vhost.name, "update", function(data){
+            vhost.vid = vhost.name;
+            vhost.editable = false;
+            $sc_utility.log("trace", "修改vhost成功");
+        });
+        $sc_utility.log("trace", "提交修改vhost请求到服务器");
     };
 
     $scope.delete_vhost= function(vhost) {
-        system_array_remove($scope.global.vhosts, vhost);
+        MSCApi.clients_update2("vhost", vhost.vid, "delete", function(data){
+            system_array_remove($scope.global.vhosts, vhost);
+            $sc_utility.log("trace", "删除vhost成功");
+        });
+        $sc_utility.log("trace", "提交删除vhost请求到服务器");
     };
 
     $scope.disable_vhost = function(vhost) {
-        vhost.enabled = false;
+        MSCApi.clients_update2("vhost", vhost.vid, "disable", function(data){
+            vhost.enabled = false;
+            $sc_utility.log("trace", "禁用vhost成功");
+        });
+        $sc_utility.log("trace", "提交禁用vhost请求到服务器");
+    };
+
+    $scope.enable_vhost = function(vhost) {
+        MSCApi.clients_update2("vhost", vhost.vid, "enable", function(data){
+            vhost.enabled = true;
+            $sc_utility.log("trace", "启用vhost成功");
+        });
+        $sc_utility.log("trace", "提交启用vhost请求到服务器");
     };
 
     // submit global config to server.
@@ -499,7 +540,10 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
             $http.jsonp($sc_server.jsonp_delete("/api/v1/clients/" + id)).success(success);
         },
         configs_raw: function(success, error) {
-            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=raw")).success(success).error(error);
+            var obj = $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=raw")).success(success);
+            if (error) {
+                obj.error(error);
+            }
         },
         configs_get: function(success) {
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=global")).success(success);
@@ -511,7 +555,25 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
             $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=minimal")).success(success);
         },
         clients_update: function(scope, value, success, error) {
-            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=update&scope=" + scope + "&value=" + value)).success(success).error(error);
+            var query = "rpc=update&scope=" + scope + "&value=" + value;
+            var obj = $http.jsonp($sc_server.jsonp_query("/api/v1/raw", query)).success(success);
+            if (error) {
+                obj.error(error);
+            }
+        },
+        clients_update2: function(scope, value, param, success, error) {
+            var query = "rpc=update&scope=" + scope + "&value=" + value + "&param=" + param;
+            var obj = $http.jsonp($sc_server.jsonp_query("/api/v1/raw", query)).success(success);
+            if (error) {
+                obj.error(error);
+            }
+        },
+        clients_update3: function(scope, value, data, param, success, error) {
+            var query = "rpc=update&scope=" + scope + "&value=" + value + "&param=" + param + "&data=" + data;
+            var obj = $http.jsonp($sc_server.jsonp_query("/api/v1/raw", query)).success(success);
+            if (error) {
+                obj.error(error);
+            }
         }
     };
 }]);
@@ -825,12 +887,23 @@ scApp.provider("$sc_utility", function(){
 
                 return true;
             },
-            object2arr: function(obj){
+            object2arr: function(obj, each) {
                 var arr = [];
                 for (var k in obj) {
-                    arr.push(obj[k]);
+                    var v = obj[k];
+
+                    if (each) {
+                        each(v);
+                    }
+
+                    arr.push(v);
                 }
                 return arr;
+            },
+            copy_object: function(dst, src) {
+                for (var k in src) {
+                    dst[k] = src[k];
+                }
             },
             refresh: async_refresh2,
             const_raw_api_not_supported: "该服务器不支持HTTP RAW API，或者配置中禁用了该功能。"

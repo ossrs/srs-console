@@ -53,6 +53,7 @@ angular.module('bravoUiPopover', [])
 
                     var toggle = function() {
                         scope.popoover_show == 'in'? hide_popover() : show_popover();
+                        render_css(tooltip);
                     };
 
                     var show_popover = function() {
