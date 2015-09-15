@@ -13,6 +13,7 @@ scApp.config(["$routeProvider", function($routeProvider){
         .when("/clients/:id", {templateUrl:"views/client.html", controller:"CSCClient"})
         .when("/configs", {templateUrl:"views/configs.html", controller:"CSCConfigs"})
         .when("/configs/:id", {templateUrl:"views/config.html", controller:"CSCConfig"})
+        .when("/dvr/:vhost/:appstream", {templateUrl:"views/dvr.html", controller:"CSCDvr"})
         .when("/summaries", {templateUrl:"views/summary.html", controller:"CSCSummary"});
 }]);
 
@@ -155,7 +156,7 @@ scApp.controller("CSCVhost", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$s
     $sc_utility.log("trace", "Retrieve vhost info from SRS");
 }]);
 
-scApp.controller("CSCStreams", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", function($scope, MSCApi, $sc_nav, $sc_utility){
+scApp.controller("CSCStreams", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $location, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_streams();
 
     $scope.kickoff = function(stream) {
@@ -163,6 +164,18 @@ scApp.controller("CSCStreams", ["$scope", "MSCApi", "$sc_nav", "$sc_utility", fu
             $sc_utility.log("warn", "Kickoff stream ok.");
         });
     };
+
+    $scope.support_raw_api = false;
+
+    $scope.dvr = function(stream){
+        var url = '/dvr/' + escape(stream.owner.name) + '/' + escape(stream.app + '___' + stream.name.replace('/', '___'));
+        //console.log(url); return;
+        $location.path(url);
+    };
+
+    MSCApi.configs_raw(function(data) {
+        $scope.support_raw_api = $sc_utility.raw_api_enabled(data);
+    });
 
     MSCApi.vhosts_get(function(data){
         var vhosts = data.vhosts;
@@ -256,6 +269,13 @@ scApp.controller("CSCClient", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
     $sc_utility.log("trace", "Retrieve client info from SRS");
 }]);
 
+scApp.controller("CSCDvr", ['$scope', '$routeParams', 'MSCApi', '$sc_nav', '$sc_utility', function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
+    $sc_nav.in_dvr();
+
+    $scope.vhost = $routeParams.vhost;
+    $scope.stream = $routeParams.appstream.replace('___', '/');
+}]);
+
 scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc_utility", "$sc_server", function($scope, $location, MSCApi, $sc_nav, $sc_utility, $sc_server){
     $sc_nav.in_configs();
 
@@ -265,7 +285,8 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
 
     MSCApi.configs_raw(function(data){
         $scope.http_api = data.http_api;
-        if (!data.http_api || !data.http_api.enabled || !data.http_api.raw_api || !data.http_api.raw_api.enabled) {
+        $scope.support_raw_api = $sc_utility.raw_api_enabled(data);
+        if (!$scope.support_raw_api) {
             $scope.warn_raw_api = $sc_utility.const_raw_api_not_supported;
             return;
         }
@@ -327,7 +348,6 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
             //console.log(global);
 
             $scope.global = global;
-            $scope.support_raw_api = true;
             //console.log(data);
         });
     }, function(data){
@@ -792,6 +812,9 @@ scApp.provider("$sc_nav", function(){
             in_configs: function(){
                 this.selected = "/configs";
             },
+            in_dvr: function(){
+                this.selected = "/dvr";
+            },
             go_summary: function($location){
                 $location.path("/summaries");
             },
@@ -905,8 +928,11 @@ scApp.provider("$sc_utility", function(){
                     dst[k] = src[k];
                 }
             },
-            refresh: async_refresh2,
-            const_raw_api_not_supported: "该服务器不支持HTTP RAW API，或者配置中禁用了该功能。"
+            raw_api_enabled: function(data) {
+                return data.http_api && data.http_api.enabled && data.http_api.raw_api && data.http_api.raw_api.enabled;
+            },
+            const_raw_api_not_supported: "该服务器不支持HTTP RAW API，或者配置中禁用了该功能。",
+            refresh: async_refresh2
         };
     }];
 });

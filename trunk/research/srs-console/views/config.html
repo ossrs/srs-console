@@ -696,6 +696,11 @@
                             <td>{{vhost.dvr.dvr_plan}}</td>
                             <td>录制计划，session: 按Session；segment: 分段；append: 一个文件。默认: session</td>
                         </tr>
+                        <tr ng-show="vhost.dvr.dvr_apply">
+                            <td>vhost.dvr.dvr_apply</td>
+                            <td><span title="{{vhost.dvr.dvr_apply}}">Filters</span></td>
+                            <td>录制应用的目标，all表示所有流，app/stream指定特定的流。默认: all</td>
+                        </tr>
                         <tr ng-show="vhost.dvr.dvr_path">
                             <td>vhost.dvr.dvr_path</td>
                             <td><span title="{{vhost.dvr.dvr_path}}">PATH</span></td>
