@@ -10,7 +10,7 @@
                 <div class="accordion-inner" ng-if="stream">
                     <p>ID: {{stream.id}}</p>
                     <p>Name: {{stream.name}}</p>
-                    <p>Vhost: <a href="#/vhosts/{{stream.vhost}}">{{stream.vhost}}</a></p>
+                    <p>Vhost: <a href="#/vhosts/{{stream.vhost}}">{{owner.name}}</a></p>
                     <p>Publishing: {{stream.publish.active| sc_filter_has_stream}}</p>
                     <p>Clients: {{stream.clients}}人</p>
                     <p>Recv: {{stream.kbps.recv_30s| sc_filter_bitrate_k}}</p>
@@ -19,6 +19,7 @@
                     <p ng-if="stream.audio">Audio: <span>{{stream.audio| sc_filter_audio}}</span></p>
                     <p>管理:  <a ng-href="{{stream| sc_filter_preview_url}}" target="_blank">预览</a></p>
                     <p ng-show="stream.publish.active">管理: <a ng-click="kickoff(stream)" href="javascript:void(0)">踢流</a></p>
+                    <p ng-show="support_raw_api">管理: <a ng-click="dvr(stream)" href="javascript:void(0)">录制</a> </p>
                 </div>
             </div>
         </div>

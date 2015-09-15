@@ -13,7 +13,7 @@ scApp.config(["$routeProvider", function($routeProvider){
         .when("/clients/:id", {templateUrl:"views/client.html", controller:"CSCClient"})
         .when("/configs", {templateUrl:"views/configs.html", controller:"CSCConfigs"})
         .when("/configs/:id", {templateUrl:"views/config.html", controller:"CSCConfig"})
-        .when("/dvr/:vhost/:appstream", {templateUrl:"views/dvr.html", controller:"CSCDvr"})
+        .when("/dvr/:vid/:sid/:app/:stream", {templateUrl:"views/dvr.html", controller:"CSCDvr"})
         .when("/summaries", {templateUrl:"views/summary.html", controller:"CSCSummary"});
 }]);
 
@@ -165,13 +165,11 @@ scApp.controller("CSCStreams", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
         });
     };
 
-    $scope.support_raw_api = false;
-
     $scope.dvr = function(stream){
-        var url = '/dvr/' + escape(stream.owner.name) + '/' + escape(stream.app + '___' + stream.name.replace('/', '___'));
-        //console.log(url); return;
-        $location.path(url);
+        $location.path($sc_utility.dvr_id(stream));
     };
+
+    $scope.support_raw_api = false;
 
     MSCApi.configs_raw(function(data) {
         $scope.support_raw_api = $sc_utility.raw_api_enabled(data);
@@ -200,7 +198,7 @@ scApp.controller("CSCStreams", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
     $sc_utility.log("trace", "Retrieve vhost info from SRS");
 }]);
 
-scApp.controller("CSCStream", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
+scApp.controller("CSCStream", ["$scope", '$location', "$routeParams", "MSCApi", "$sc_nav", "$sc_utility", function($scope, $location, $routeParams, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_streams();
 
     $scope.kickoff = function(stream) {
@@ -210,6 +208,16 @@ scApp.controller("CSCStream", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
     };
 
     $sc_utility.refresh.stop();
+
+    $scope.dvr = function(stream){
+        $location.path($sc_utility.dvr_id(stream));
+    };
+
+    $scope.support_raw_api = false;
+
+    MSCApi.configs_raw(function(data) {
+        $scope.support_raw_api = $sc_utility.raw_api_enabled(data);
+    });
 
     MSCApi.streams_get2($routeParams.id, function(data){
         var stream = data.stream;
@@ -272,8 +280,51 @@ scApp.controller("CSCClient", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
 scApp.controller("CSCDvr", ['$scope', '$routeParams', 'MSCApi', '$sc_nav', '$sc_utility', function($scope, $routeParams, MSCApi, $sc_nav, $sc_utility){
     $sc_nav.in_dvr();
 
-    $scope.vhost = $routeParams.vhost;
-    $scope.stream = $routeParams.appstream.replace('___', '/');
+    $scope.vid = $routeParams.vid;
+    $scope.sid = $routeParams.sid;
+    $scope.app = $routeParams.app.replace('___', '/');
+    $scope.stream = $routeParams.stream.replace('___', '/');
+
+    $sc_utility.refresh.stop();
+
+    $scope.dvr = function(conf) {
+        //console.log(apply); return;
+
+        // submit to server.
+        $sc_utility.log("trace", "Submit to server for dvr apply=" + conf.value);
+        MSCApi.clients_update3("dvr", $scope.vid, $scope.app + '/' + $scope.stream, conf.value? 'enable':'disable', function(data){
+            $sc_utility.log("trace", "Server accepted, dvr apply=" + conf.value);
+            conf.error = false;
+        }, function(){
+            conf.error = true;
+        });
+
+        return true;
+    };
+
+    MSCApi.configs_get2($scope.vid, function(data){
+        data.vhost.stream = $scope.stream;
+        data.vhost.app = $scope.app;
+        data.vhost.vid = $scope.vid;
+        data.vhost.sid = $scope.sid;
+
+        var dvr = data.vhost.dvr;
+        if (dvr && dvr.dvr_apply) {
+            if (dvr.dvr_apply.length == 1 && dvr.dvr_apply[0] == "all") {
+                dvr.apply = true;
+            } else {
+                dvr.apply = system_array_contains(dvr.dvr_apply, $scope.app + '/' + $scope.stream);
+            }
+        } else {
+            dvr.apply = true;
+        }
+        console.log(data.vhost);
+
+        $scope.global = $sc_utility.object2complex({}, data.vhost, null);
+        console.log($scope.global);
+    });
+
+    $sc_utility.log("trace", "Retrieve vhost config info from SRS");
 }]);
 
 scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc_utility", "$sc_server", function($scope, $location, MSCApi, $sc_nav, $sc_utility, $sc_server){
@@ -292,63 +343,9 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
         }
 
         MSCApi.configs_get(function(data){
-            /**
-             * transform the api data to angularjs perfer, for instance:
-                     data.global.listen = ["1935, "1936"];
-                     data.global.http_api.listen = "1985";
-             * parsed to:
-                     global.listen = {
-                        key: 'listen',
-                        value: ["1935", "1936"],
-                        error: false
-                     }
-                     global.http_api.listen = {
-                        key: 'http_api.listen',
-                        value: "1985",
-                        error: false
-                     }
-             * where the error is used for commit error.
-             */
-            var object2complex = function(complex, obj, prefix) {
-                for (var k in obj) {
-                    var v = obj[k];
-                    //console.log("k=" + key + ", v=" + typeof v + ", " + v);
-
-                    var key = prefix? prefix + "." + k : k;
-                    if (key == "vhosts") {
-                        // use name as vhost id.
-                        complex[k] = $sc_utility.object2arr(v, function(e) { e.vid = e.name; });
-                        continue;
-                    }
-
-                    if (typeof v == "object" && v.constructor != Array) {
-                        var cv = {};
-                        complex[k] = cv;
-
-                        object2complex(cv, v, key);
-                        continue;
-                    }
-
-                    // convert number to str for select to
-                    // choose the right default one.
-                    if (key == "pithy_print_ms") {
-                        v = String(v);
-                    }
-
-                    complex[k] = {
-                        key: system_string_trim(key, 'global.'),
-                        value: v,
-                        error: false
-                    };
-                }
-            };
-            var global = {};
             //console.log(data.global);
-            object2complex(global, data.global, null);
-            //console.log(global);
-
-            $scope.global = global;
-            //console.log(data);
+            $scope.global = $sc_utility.object2complex({}, data.global, null);
+            //console.log($scope.global);
         });
     }, function(data){
         $scope.warn_raw_api = $sc_utility.const_raw_api_not_supported;
@@ -923,10 +920,69 @@ scApp.provider("$sc_utility", function(){
                 }
                 return arr;
             },
+            /**
+             * transform the api data to angularjs perfer, for instance:
+             data.global.listen = ["1935, "1936"];
+             data.global.http_api.listen = "1985";
+             * parsed to:
+             global.listen = {
+                        key: 'listen',
+                        value: ["1935", "1936"],
+                        error: false
+                     }
+             global.http_api.listen = {
+                        key: 'http_api.listen',
+                        value: "1985",
+                        error: false
+                     }
+             * where the error is used for commit error.
+             */
+            object2complex: function(complex, obj, prefix) {
+                for (var k in obj) {
+                    var v = obj[k];
+                    //console.log("k=" + key + ", v=" + typeof v + ", " + v);
+
+                    var key = prefix? prefix + "." + k : k;
+                    if (key == "vhosts") {
+                        // use name as vhost id.
+                        complex[k] = this.object2arr(v, function(e) { e.vid = e.name; });
+                        continue;
+                    }
+
+                    if (typeof v == "object" && v.constructor != Array) {
+                        var cv = {};
+                        complex[k] = cv;
+
+                        this.object2complex(cv, v, key);
+                        continue;
+                    }
+
+                    // convert number to str for select to
+                    // choose the right default one.
+                    if (key == "pithy_print_ms") {
+                        v = String(v);
+                    }
+
+                    complex[k] = {
+                        key: system_string_trim(key, 'global.'),
+                        value: v,
+                        error: false
+                    };
+                }
+
+                return complex;
+            },
             copy_object: function(dst, src) {
                 for (var k in src) {
                     dst[k] = src[k];
                 }
+            },
+            dvr_id: function(stream) {
+                var url = '/dvr/' + stream.owner.name
+                    + '/' + stream.id
+                    + '/' + escape(stream.app.replace('/', '___'))
+                    + '/' + escape(stream.name.replace('/', '___'));
+                return url;
             },
             raw_api_enabled: function(data) {
                 return data.http_api && data.http_api.enabled && data.http_api.raw_api && data.http_api.raw_api.enabled;
@@ -1019,14 +1075,18 @@ scApp.directive("scPretty2", [function(){
         scope: {
             data: '=scpData',
             desc: '@scpDesc',
-            bool: '@scpBool'
+            bool: '@scpBool',
+            link: '@scpLink'
         },
         controller: ['$scope', function($scope){
         }],
         template: ''
             + '<td>{{key}}</td>'
             + '<td>'
-                + '<span class="{{data.value == undefined? \'label\':\'\'}}">'
+                + '<span ng-if="link">'
+                    + '<a href="{{link}}">{{data.value}}</a>'
+                + '</span>'
+                + '<span class="{{data.value == undefined? \'label\':\'\'}}" ng-if="!link">'
                     + '<span ng-show="bool && data.value != undefined">{{data.value| sc_filter_enabled}}</span>'
                     + '<span ng-show="!bool || data.value == undefined">{{data.value| sc_filter_obj}}</span>'
                 + '</span>'
