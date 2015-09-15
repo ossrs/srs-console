@@ -309,7 +309,12 @@ scApp.controller("CSCDvr", ['$scope', '$routeParams', 'MSCApi', '$sc_nav', '$sc_
         data.vhost.sid = $scope.sid;
 
         var dvr = data.vhost.dvr;
-        if (dvr && dvr.dvr_apply) {
+        if (!dvr) {
+            dvr = {
+                enabled: false
+            };
+        }
+        if (dvr.dvr_apply) {
             if (dvr.dvr_apply.length == 1 && dvr.dvr_apply[0] == "all") {
                 dvr.apply = true;
             } else {
