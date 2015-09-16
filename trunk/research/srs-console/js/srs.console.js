@@ -133,7 +133,7 @@ scApp.controller("CSCSummary", ["$scope", "MSCApi", "$sc_utility", "$sc_nav", fu
                     kbps.in.sys = (data.data.system.net_recv_bytes - $scope.pre_kbps.system.net_recv_bytes) * 8 / diff;
                     kbps.in.inner = (data.data.system.net_recvi_bytes - $scope.pre_kbps.system.net_recvi_bytes) * 8 / diff;
 
-                    kbps.out.sys = (data.data.system.net_recv_bytes - $scope.pre_kbps.system.net_recv_bytes) * 8 / diff;
+                    kbps.out.sys = (data.data.system.net_send_bytes - $scope.pre_kbps.system.net_send_bytes) * 8 / diff;
                     kbps.out.inner = (data.data.system.net_sendi_bytes - $scope.pre_kbps.system.net_sendi_bytes) * 8 / diff;
                 }
 
