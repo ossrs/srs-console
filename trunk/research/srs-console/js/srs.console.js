@@ -116,8 +116,45 @@ scApp.controller("CSCConnect", ["$scope", "$location", "MSCApi", "$sc_utility", 
 scApp.controller("CSCSummary", ["$scope", "MSCApi", "$sc_utility", "$sc_nav", function($scope, MSCApi, $sc_utility, $sc_nav){
     $sc_nav.in_summary();
 
+    $scope.pre_kbps = null;
+
     $sc_utility.refresh.refresh_change(function(){
         MSCApi.summaries_get(function(data){
+            var kbps = {
+                initialized: false,
+                in: { srs: 0, sys: 0, inner: 0 },
+                out: { srs: 0, sys: 0, inner: 0 }
+            };
+            if ($scope.pre_kbps) {
+                kbps.initialized = true;
+
+                var diff = data.data.system.net_sample_time - $scope.pre_kbps.system.net_sample_time;
+                if (diff > 0) {
+                    kbps.in.sys = (data.data.system.net_recv_bytes - $scope.pre_kbps.system.net_recv_bytes) * 8 / diff;
+                    kbps.in.inner = (data.data.system.net_recvi_bytes - $scope.pre_kbps.system.net_recvi_bytes) * 8 / diff;
+
+                    kbps.out.sys = (data.data.system.net_recv_bytes - $scope.pre_kbps.system.net_recv_bytes) * 8 / diff;
+                    kbps.out.inner = (data.data.system.net_sendi_bytes - $scope.pre_kbps.system.net_sendi_bytes) * 8 / diff;
+                }
+
+                diff = data.data.system.srs_sample_time - $scope.pre_kbps.system.srs_sample_time;
+                if (diff > 0) {
+                    kbps.in.srs = (data.data.system.srs_recv_bytes - $scope.pre_kbps.system.srs_recv_bytes) * 8 / diff;
+                    kbps.out.srs = (data.data.system.srs_send_bytes - $scope.pre_kbps.system.srs_send_bytes) * 8 / diff;
+                }
+
+                diff = data.data.now_ms - $scope.pre_kbps.now_ms;
+                if (!$scope.kbps.initialized || diff >= 20 * 1000) {
+                    $scope.pre_kbps = data.data;
+                    $scope.kbps = kbps;
+                }
+            }
+            if (!$scope.kbps) {
+                $scope.pre_kbps = data.data;
+                $scope.kbps = kbps;
+            }
+
+            $scope.global = data.data;
             $scope.server = data.data.self;
             $scope.system = data.data.system;
 
@@ -630,7 +667,29 @@ scApp.filter("sc_filter_filesize_k", function(){
         if (v > 1024) {
             return Number(v / 1024.0).toFixed(2) + "MB";
         }
-        return v + "KB";
+        return Number(v).toFixed(2) + "KB";
+    };
+});
+
+scApp.filter("sc_filter_filesize_k2", function(){
+    return function(v){
+        // PB
+        if (v > 1024 * 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024 / 1024).toFixed(0) + "PB";
+        }
+        // TB
+        if (v > 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024).toFixed(0) + "TB";
+        }
+        // GB
+        if (v > 1024 * 1024) {
+            return Number(v / 1024.0 / 1024).toFixed(0) + "GB";
+        }
+        // MB
+        if (v > 1024) {
+            return Number(v / 1024.0).toFixed(0) + "MB";
+        }
+        return Number(v).toFixed(0) + "KB";
     };
 });
 
@@ -652,7 +711,29 @@ scApp.filter("sc_filter_filerate_k", function(){
         if (v > 1024) {
             return Number(v / 1024.0).toFixed(2) + "MBps";
         }
-        return v + "KBps";
+        return Number(v).toFixed(2) + "KBps";
+    };
+});
+
+scApp.filter("sc_filter_filerate_k2", function(){
+    return function(v){
+        // PB
+        if (v > 1024 * 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024 / 1024).toFixed(0) + "PBps";
+        }
+        // TB
+        if (v > 1024 * 1024 * 1024) {
+            return Number(v / 1024.0 / 1024 / 1024).toFixed(0) + "TBps";
+        }
+        // GB
+        if (v > 1024 * 1024) {
+            return Number(v / 1024.0 / 1024).toFixed(0) + "GBps";
+        }
+        // MB
+        if (v > 1024) {
+            return Number(v / 1024.0).toFixed(0) + "MBps";
+        }
+        return Number(v).toFixed(0) + "KBps";
     };
 });
 
@@ -674,7 +755,29 @@ scApp.filter("sc_filter_bitrate_k", function(){
         if (v > 1000) {
             return Number(v / 1000.0).toFixed(2) + "Mbps";
         }
-        return v + "Kbps";
+        return Number(v).toFixed(2) + "Kbps";
+    };
+});
+
+scApp.filter("sc_filter_bitrate_k2", function(){
+    return function(v){
+        // PB
+        if (v > 1000 * 1000 * 1000 * 1000) {
+            return Number(v / 1000.0 / 1000 / 1000 / 1000).toFixed(0) + "Pbps";
+        }
+        // TB
+        if (v > 1000 * 1000 * 1000) {
+            return Number(v / 1000.0 / 1000 / 1000).toFixed(0) + "Tbps";
+        }
+        // GB
+        if (v > 1000 * 1000) {
+            return Number(v / 1000.0 / 1000).toFixed(0) + "Gbps";
+        }
+        // MB
+        if (v > 1000) {
+            return Number(v / 1000.0).toFixed(0) + "Mbps";
+        }
+        return Number(v).toFixed(0) + "Kbps";
     };
 });
 
@@ -684,9 +787,21 @@ scApp.filter("sc_filter_percent", function(){
     };
 });
 
+scApp.filter("sc_filter_percent2", function(){
+    return function(v){
+        return Number(v).toFixed(0) + "%";
+    };
+});
+
 scApp.filter("sc_filter_percentf", function(){
     return function(v){
         return Number(v * 100).toFixed(2) + "%";
+    };
+});
+
+scApp.filter("sc_filter_percentf2", function(){
+    return function(v){
+        return Number(v * 100).toFixed(0) + "%";
     };
 });
 
