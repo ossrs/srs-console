@@ -244,6 +244,31 @@
         <div class="accordion-group" ng-show="support_raw_api">
             <div class="accordion-heading" sc-collapse="hide">
                 <a class="accordion-toggle" href="javascript:void(0)">
+                    Kafka集群配置(kafka)
+                </a>
+            </div>
+            <div class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <table class="table table-striped table-hover table-bordered">
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                            <th>Opt</th>
+                        </tr>
+                        <tr sc-pretty2 scp-data="global.kafka.enabled" scp-bool="true"
+                            scp-desc="是否开启Kafka，开启后SRS将数据汇报给Kafka集群。默认: {{false| sc_filter_enabled}}">
+                        </tr>
+                        <tr sc-pretty2 scp-data="global.kafka.brokers"
+                            scp-desc="Broker列表，首次连接到Broker获取集群信息，格式是&lt;ip:port&gt;。">
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group" ng-show="support_raw_api">
+            <div class="accordion-heading" sc-collapse="hide">
+                <a class="accordion-toggle" href="javascript:void(0)">
                     服务器心跳汇报(heartbeat)
                 </a>
             </div>
