@@ -104,3 +104,4 @@ var scDirectiveTemplate = ''
       + '</a> '
       + '<a href="javascript:void(0)" ng-click="cancel()" ng-show="editing" title="Cancel">Cancel</a> '
     + '</td>';
+

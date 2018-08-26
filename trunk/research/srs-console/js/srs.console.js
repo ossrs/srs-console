@@ -366,12 +366,13 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
     $sc_utility.refresh.stop();
 
     $scope.support_raw_api = false;
+    $scope.warn_raw_api = false;
 
     MSCApi.configs_raw(function(data){
         $scope.http_api = data.http_api;
         $scope.support_raw_api = $sc_utility.raw_api_enabled(data);
         if (!$scope.support_raw_api) {
-            $scope.warn_raw_api = $sc_utility.const_raw_api_not_supported;
+            $scope.warn_raw_api = true;
             return;
         }
 
@@ -381,7 +382,7 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
             //console.log($scope.global);
         });
     }, function(data){
-        $scope.warn_raw_api = $sc_utility.const_raw_api_not_supported;
+        $scope.warn_raw_api = true;
     });
 
     // operate vhost in client.
@@ -637,6 +638,12 @@ scApp.filter("sc_filter_log_level", function(){
 scApp.filter("sc_filter_nav_active", ["$sc_nav", function($sc_nav){
     return function(v){
         return $sc_nav.is_selected(v)? "active":"";
+    };
+}]);
+
+scApp.filter("sc_unsafe", ['$sce', function($sce){
+    return function(v) {
+        return $sce.trustAsHtml(v);
     };
 }]);
 
@@ -1041,7 +1048,6 @@ scApp.provider("$sc_utility", function(){
             raw_api_enabled: function(data) {
                 return data.http_api && data.http_api.enabled && data.http_api.raw_api && data.http_api.raw_api.enabled;
             },
-            const_raw_api_not_supported: "该服务器不支持HTTP RAW API，或者配置中禁用了该功能。",
             refresh: async_refresh2
         };
     }];
