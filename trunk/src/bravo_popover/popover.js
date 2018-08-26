@@ -9,8 +9,8 @@ angular.module('bravoUiPopover', [])
             },
             compile: function (elem, attr) {
                 var confirm_template = attr['bravoPopoverConfirm'] ? '<span>' +
-                            '<a class="btn btn-danger" ng-click="on_confirm()">确定</a> ' +
-                            '<a class="btn btn-info" ng-click="on_cancel()">取消</a>' +
+                            '<a class="btn btn-danger" ng-click="on_confirm()">Confirm</a> ' +
+                            '<a class="btn btn-info" ng-click="on_cancel()">Cancel</a>' +
                         '</span>' : '';
                 var template =
                     '<div class="popover fade {{placement}} in" ng-show="popoover_show == \'in\'">' +
