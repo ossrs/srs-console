@@ -25,6 +25,7 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
 
     // handle system error event, from $sc_utility service.
     $scope.$on("$sc_utility_http_error", function(event, status, response){
+        var code = response.code;
         if (status != 200) {
             if (!status && !response) {
                 response = "无法访问服务器";
@@ -33,6 +34,7 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
             }
         } else {
             var map = {
+                1061: "RAW API被禁用",
                 1062: "服务器不允许这个操作",
                 1063: "RawApi参数不符合要求"
             };
@@ -43,20 +45,11 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
             }
         }
 
+        if (code === 1061) {
+            $sc_utility.log("trace", response);
+            return;
+        }
         $sc_utility.log("warn", response);
-    });
-
-    // handle location events.
-    $scope.$on("$locationChangeStart", function(){
-        // we store the config in the query string url.
-        // always set the host and port in query.
-        if (!$location.search().host && $sc_server.host) {
-            $location.search("host", $sc_server.host);
-        }
-
-        if (!$location.search().port && $sc_server.port) {
-            $location.search("port", $sc_server.port);
-        }
     });
 
     // reset the config.
@@ -904,6 +897,9 @@ scApp.provider("$sc_server", [function(){
                 return this.baseurl() + url + "?callback=JSON_CALLBACK&" + query;
             },
             init: function($location, MSCApi) {
+                // Set the right schema for proxy.
+                this.schema = $location.protocol();
+
                 // query string then url.
                 if ($location.search().host) {
                     this.host = $location.search().host;
