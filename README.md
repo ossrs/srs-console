@@ -8,7 +8,9 @@
 Put the HTML files under your WebServer:
 
 ```
-trunk/research/srs-console
+trunk/research/console
 ```
 
-Online demo: http://ossrs.net/console/ng_index.html
+Online demo: http://ossrs.net/console/
+
+
