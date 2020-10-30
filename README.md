@@ -11,6 +11,6 @@ Put the HTML files under your WebServer:
 trunk/research/console
 ```
 
-Online demo: http://ossrs.net/console/
+Online demo: [http://ossrs.net/console](http://ossrs.net/console)
 
-
+2020.10, Winlin.
