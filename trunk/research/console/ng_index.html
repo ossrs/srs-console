@@ -24,16 +24,16 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
-                <a class="brand" href="javascript:void(0)" ng-click="reset()">SRS</a>
+                <a class="brand" href="https://github.com/ossrs/srs" target="_blank">SRS</a>
                 <ul class="nav">
-                    <li class="{{'/console'| sc_filter_nav_active}}"><a ng-href="#connect">连接SRS</a></li>
-                    <li class="{{'/summaries'| sc_filter_nav_active}}"><a ng-href="#summaries">概览</a></li>
-                    <li class="{{'/vhosts'| sc_filter_nav_active}}"><a ng-href="#vhosts">虚拟主机(Vhosts)</a></li>
-                    <li class="{{'/streams'| sc_filter_nav_active}}"><a ng-href="#streams">视频流</a></li>
-                    <li class="{{'/clients'| sc_filter_nav_active}}"><a ng-href="#clients">客户端</a></li>
-                    <li class="{{'/configs'| sc_filter_nav_active}}"><a ng-href="#configs">配置</a></li>
-                    <li class="{{'/dvr'| sc_filter_nav_active}}"><a ng-href="#dvr">DVR</a></li>
-                    <li><a href="en_index.html">English</a></li>
+                    <li class="{{'/console'| sc_filter_nav_active}}"><a ng-href="javascript:void(0)" ng-click="gogogo('/connect')">连接SRS</a></li>
+                    <li class="{{'/summaries'| sc_filter_nav_active}}"><a ng-href="javascript:void(0)" ng-click="gogogo('/summaries')">概览</a></li>
+                    <li class="{{'/vhosts'| sc_filter_nav_active}}"><a ng-href="javascript:void(0)" ng-click="gogogo('/vhosts')">虚拟主机(Vhosts)</a></li>
+                    <li class="{{'/streams'| sc_filter_nav_active}}"><a ng-href="javascript:void(0)" ng-click="gogogo('/streams')">视频流</a></li>
+                    <li class="{{'/clients'| sc_filter_nav_active}}"><a ng-href="javascript:void(0)" ng-click="gogogo('/clients')">客户端</a></li>
+                    <li class="{{'/configs'| sc_filter_nav_active}}"><a ng-href="javascript:void(0)" ng-click="gogogo('/configs')">配置</a></li>
+                    <li class="{{'/dvr'| sc_filter_nav_active}}"><a ng-href="javascript:void(0)" ng-click="gogogo('/dvr')">DVR</a></li>
+                    <li><a href="javascript:void(0)" ng-click="redirect('ng_index.html', 'en_index.html')">English</a></li>
                     <li>
                         <a href="https://github.com/ossrs/srs-console">
                             <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ossrs/srs-console?style=social">

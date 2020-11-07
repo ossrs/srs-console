@@ -20,7 +20,7 @@
                             <th>HLS</th>
                         </tr>
                         <tr ng-repeat="vhost in vhosts">
-                            <td><a href="#/vhosts/{{vhost.id}}">{{vhost.id}}</a></td>
+                            <td><a href="javascript:void(0)" ng-click="gogogo('/vhosts/' + vhost.id)">{{vhost.id}}</a></td>
                             <td>{{vhost.name}}</td>
                             <td>{{vhost.enabled| sc_filter_enabled}}</td>
                             <td>{{vhost.streams}}个</td>

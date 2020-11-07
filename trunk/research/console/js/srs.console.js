@@ -1,5 +1,5 @@
 
-scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_utility", "$sc_server", function($scope, $interval, $location, MSCApi, $sc_utility, $sc_server){
+scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_utility", "$sc_server", '$sc_nav', function($scope, $interval, $location, MSCApi, $sc_utility, $sc_server, $sc_nav){
     $scope.logs = [];
     // remove expired alert.
     $interval(function(){
@@ -26,7 +26,7 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
     // handle system error event, from $sc_utility service.
     $scope.$on("$sc_utility_http_error", function(event, status, response){
         var code = response.code;
-        if (status != 200) {
+        if (status !== 200) {
             if (!status && !response) {
                 response = "无法访问服务器";
             } else {
@@ -52,15 +52,20 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
         $sc_utility.log("warn", response);
     });
 
-    // reset the config.
-    $scope.reset = function(){
-        $sc_server.host = $location.host();
-        $sc_server.port = 1985;
-
-        $location.search("host", $sc_server.host);
-        $location.search("port", $sc_server.port);
-
-        $location.path("/connect")
+    $scope.gogogo = function (path) {
+        $location.path(path);
+    };
+    $scope.goto = function (path) {
+        var absUrl = $sc_server.buildNavUrl();
+        var url = absUrl.replace($location.$$path, path);
+        var win = window.open('', '_self');
+        win.location = url; // For safari security reason, we should set the location instead.
+    };
+    $scope.redirect = function (from, to) {
+        var absUrl = $sc_server.buildNavUrl();
+        var url = absUrl.replace(from, to);
+        var win = window.open('', '_self');
+        win.location = url; // For safari security reason, we should set the location instead.
     };
 
     // init the server and port for api.
@@ -72,19 +77,18 @@ scApp.controller("CSCMain", ["$scope", "$interval", "$location", "MSCApi", "$sc_
 scApp.controller("CSCConnect", ["$scope", "$location", "MSCApi", "$sc_utility", "$sc_nav", "$sc_server", function($scope, $location, MSCApi, $sc_utility, $sc_nav, $sc_server){
     $sc_nav.in_control();
     $scope.server = {
+        schema: $sc_server.schema,
         ip: $sc_server.host,
         port: $sc_server.port
     };
     $scope.connect = function(){
+        $sc_server.schema = $scope.server.schema;
         $sc_server.host = $scope.server.ip;
         $sc_server.port = $scope.server.port;
 
-        $location.search("host", $sc_server.host);
-        $location.search("port", $sc_server.port);
-
         MSCApi.versions_get(function(data){
             $sc_utility.log("trace", "连接到SRS" + $scope.server.ip + "成功, SRS/" + data.data.version);
-            $sc_nav.go_summary($location);
+            $scope.goto('/summaries');
         });
     };
 
@@ -197,7 +201,7 @@ scApp.controller("CSCStreams", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
             MSCApi.streams_get(function(data){
                 for (var k in data.streams) {
                     var stream = data.streams[k];
-                    stream.owner = system_array_get(vhosts, function(vhost) {return vhost.id == stream.vhost; });
+                    stream.owner = system_array_get(vhosts, function(vhost) {return vhost.id === stream.vhost; });
                 }
 
                 $scope.streams = data.streams;
@@ -336,7 +340,7 @@ scApp.controller("CSCDvr", ['$scope', '$routeParams', 'MSCApi', '$sc_nav', '$sc_
             };
         }
         if (dvr.dvr_apply) {
-            if (dvr.dvr_apply.length == 1 && dvr.dvr_apply[0] == "all") {
+            if (dvr.dvr_apply.length === 1 && dvr.dvr_apply[0] === "all") {
                 dvr.apply = true;
             } else {
                 dvr.apply = system_array_contains(dvr.dvr_apply, $scope.app + '/' + $scope.stream);
@@ -400,7 +404,7 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
 
     // submit vhost to server
     $scope.add_vhost = function(vhost) {
-        if (system_array_contains($scope.global.vhosts, function(e){ return vhost != e && vhost.name == e.name; })) {
+        if (system_array_contains($scope.global.vhosts, function(e){ return vhost !== e && vhost.name === e.name; })) {
             $sc_utility.log("warn", "vhost " + vhost.name + "已经存在");
             return;
         }
@@ -417,7 +421,7 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
     };
 
     $scope.update_vhost = function(vhost) {
-        if (vhost.vid == vhost.name) {
+        if (vhost.vid === vhost.name) {
             $sc_utility.log("warn", "Vhost没有任何改变");
             return;
         }
@@ -456,18 +460,18 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
 
     // submit global config to server.
     $scope.submit = function(conf) {
-        if (typeof conf.value != "boolean" && !conf.value) {
+        if (typeof conf.value !== "boolean" && !conf.value) {
             $sc_utility.log("warn", "global." + conf.key + " should not be empty");
             return false;
         }
 
         var v = conf.value;
-        if (conf.key == "listen") {
+        if (conf.key === "listen") {
             if (!system_array_foreach(v, function(e){ return e; })) {
                 $sc_utility.log("warn", "listen should not be empty");
                 return false;
             }
-        } else if (conf.key == "pid") {
+        } else if (conf.key === "pid") {
             if (!system_string_startswith(v, ['./', '/var/', '/tmp/'])) {
                 $sc_utility.log("warn", "pid should starts with ./, /var/ or /tmp/");
                 return false;
@@ -476,27 +480,27 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
                 $sc_utility.log("warn", "pid should be *.pid");
                 return false;
             }
-        } else if (conf.key == "chunk_size") {
+        } else if (conf.key === "chunk_size") {
             if (parseInt(v) < 128 || parseInt(v) > 65535) {
                 $sc_utility.log("warn", "chunk_size should in [128, 65535], value=" + v);
                 return false;
             }
-        } else if (conf.key == "ff_log_dir") {
-            if (v != '/dev/null' && !system_string_startswith(v, ['/var/', '/tmp/', './'])) {
+        } else if (conf.key === "ff_log_dir") {
+            if (v !== '/dev/null' && !system_string_startswith(v, ['/var/', '/tmp/', './'])) {
                 $sc_utility.log("warn", "ff_log_dir should be /dev/null or in ./, /var/ or /tmp/");
                 return false;
             }
-        } else if (conf.key == "srs_log_tank") {
-            if (v != "file" && v != "console") {
+        } else if (conf.key === "srs_log_tank") {
+            if (v !== "file" && v !== "console") {
                 $sc_utility.log("warn", "srs_log_tank should be file or console");
                 return false;
             }
-        } else if (conf.key == "srs_log_level") {
-            if (v != "verbose" && v != "info" && v != "trace" && v != "warn" && v != "error") {
+        } else if (conf.key === "srs_log_level") {
+            if (v !== "verbose" && v !== "info" && v !== "trace" && v !== "warn" && v !== "error") {
                 $sc_utility.log("warn", "srs_log_level should be verbose, info, trace, warn, error");
                 return false;
             }
-        } else if (conf.key == "srs_log_file") {
+        } else if (conf.key === "srs_log_file") {
             if (!system_string_startswith(v, ['./', '/var/', '/tmp/'])) {
                 $sc_utility.log("warn", "srs_log_file should be in ./, /var/ or /tmp/");
                 return false;
@@ -505,17 +509,17 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
                 $sc_utility.log("warn", "srs_log_file should be *.log");
                 return false;
             }
-        } else if (conf.key == "max_connections") {
+        } else if (conf.key === "max_connections") {
             if (parseInt(v) < 10 || parseInt(v) > 65535) {
                 $sc_utility.log("warn", "max_connections should in [10, 65535], value=" + v);
                 return false;
             }
-        } else if (conf.key == "utc_time") {
-            if (v == undefined) {
+        } else if (conf.key === "utc_time") {
+            if (v === undefined) {
                 $sc_utility.log("warn", "utc_time invalid");
                 return false;
             }
-        } else if (conf.key == "pithy_print_ms") {
+        } else if (conf.key === "pithy_print_ms") {
             if (parseInt(v) < 100 || parseInt(v) > 300000) {
                 $sc_utility.log("warn", "pithy_print_ms invalid");
                 return false;
@@ -529,7 +533,7 @@ scApp.controller("CSCConfigs", ["$scope", "$location", "MSCApi", "$sc_nav", "$sc
             conf.error = false;
 
             // reload the rtmp service port when port changed.
-            if (conf.key == "listen") {
+            if (conf.key === "listen") {
                 $sc_server.init($location, MSCApi);
             }
         }, function(){
@@ -557,64 +561,80 @@ scApp.controller("CSCConfig", ["$scope", "$routeParams", "MSCApi", "$sc_nav", "$
 scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
     return {
         versions_get: function(success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/versions")).success(success);
+            var url = $sc_server.jsonp("/api/v1/versions");
+            $http.jsonp(url).success(success);
         },
         summaries_get: function(success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/summaries")).success(success);
+            var url = $sc_server.jsonp("/api/v1/summaries");
+            $http.jsonp(url).success(success);
         },
         vhosts_get: function(success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/vhosts")).success(success);
+            var url = $sc_server.jsonp("/api/v1/vhosts");
+            $http.jsonp(url).success(success);
         },
         vhosts_get2: function(id, success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/vhosts/" + id)).success(success);
+            var url = $sc_server.jsonp("/api/v1/vhosts/" + id);
+            $http.jsonp(url).success(success);
         },
         streams_get: function(success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/streams")).success(success);
+            var url = $sc_server.jsonp("/api/v1/streams");
+            $http.jsonp(url).success(success);
         },
         streams_get2: function(id, success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/streams/" + id)).success(success);
+            var url = $sc_server.jsonp("/api/v1/streams/" + id);
+            $http.jsonp(url).success(success);
         },
         clients_get: function(success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/clients")).success(success);
+            var url = $sc_server.jsonp("/api/v1/clients");
+            $http.jsonp(url).success(success);
         },
         clients_get2: function(id, success) {
-            $http.jsonp($sc_server.jsonp("/api/v1/clients/" + id)).success(success);
+            var url = $sc_server.jsonp("/api/v1/clients/" + id);
+            $http.jsonp(url).success(success);
         },
         clients_delete: function(id, success) {
-            $http.jsonp($sc_server.jsonp_delete("/api/v1/clients/" + id)).success(success);
+            var url = $sc_server.jsonp_delete("/api/v1/clients/" + id);
+            $http.jsonp(url).success(success);
         },
         configs_raw: function(success, error) {
-            var obj = $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=raw")).success(success);
+            var url = $sc_server.jsonp_query("/api/v1/raw", "rpc=raw");
+            var obj = $http.jsonp(url).success(success);
             if (error) {
                 obj.error(error);
             }
         },
         configs_get: function(success) {
-            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=global")).success(success);
+            var url = $sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=global");
+            $http.jsonp(url).success(success);
         },
         configs_get2: function(id, success) {
-            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=vhost&vhost=" + id)).success(success);
+            var url = $sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=vhost&vhost=" + id);
+            $http.jsonp(url).success(success);
         },
         configs_get3: function(success) {
-            $http.jsonp($sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=minimal")).success(success);
+            var url = $sc_server.jsonp_query("/api/v1/raw", "rpc=query&scope=minimal");
+            $http.jsonp(url).success(success);
         },
         clients_update: function(scope, value, success, error) {
             var query = "rpc=update&scope=" + scope + "&value=" + value;
-            var obj = $http.jsonp($sc_server.jsonp_query("/api/v1/raw", query)).success(success);
+            var url = $sc_server.jsonp_query("/api/v1/raw", query);
+            var obj = $http.jsonp(url).success(success);
             if (error) {
                 obj.error(error);
             }
         },
         clients_update2: function(scope, value, param, success, error) {
             var query = "rpc=update&scope=" + scope + "&value=" + value + "&param=" + param;
-            var obj = $http.jsonp($sc_server.jsonp_query("/api/v1/raw", query)).success(success);
+            var url = $sc_server.jsonp_query("/api/v1/raw", query);
+            var obj = $http.jsonp(url).success(success);
             if (error) {
                 obj.error(error);
             }
         },
         clients_update3: function(scope, value, data, param, success, error) {
             var query = "rpc=update&scope=" + scope + "&value=" + value + "&param=" + param + "&data=" + data;
-            var obj = $http.jsonp($sc_server.jsonp_query("/api/v1/raw", query)).success(success);
+            var url = $sc_server.jsonp_query("/api/v1/raw", query);
+            var obj = $http.jsonp(url).success(success);
             if (error) {
                 obj.error(error);
             }
@@ -624,7 +644,7 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
 
 scApp.filter("sc_filter_log_level", function(){
     return function(v) {
-        return (v == "warn" || v == "error")? "alert-warn":"alert-success";
+        return (v === "warn" || v === "error")? "alert-warn":"alert-success";
     };
 });
 
@@ -808,7 +828,7 @@ scApp.filter("sc_filter_video", function(){
 
 scApp.filter("sc_filter_audio", function(){
     return function(v){
-        return v? v.codec + "/" + v.sample_rate + "/" + (v.channel == 2? "Stereo":"Mono") + "/" + v.profile : "无音频";
+        return v? v.codec + "/" + v.sample_rate + "/" + (v.channel === 2? "Stereo":"Mono") + "/" + v.profile : "无音频";
     };
 });
 
@@ -832,7 +852,7 @@ scApp.filter('sc_filter_style_error', function(){
 
 scApp.filter('sc_filter_preview_url', ['$sc_server', function($sc_server){
     return function(v){
-        var page = "http://ossrs.net/players/srs_player.html";
+        var page = $sc_server.schema + "://ossrs.net/players/srs_player.html";
         var rtmp = $sc_server.rtmp[$sc_server.rtmp.length - 1];
         var query = "vhost=" + v.owner.name + "&app=" + v.app + "&stream=" + v.name;
         query += "&server=" + $sc_server.host +"&port=" + rtmp + "&autostart=true";
@@ -870,7 +890,7 @@ scApp.provider("$sc_nav", function(){
                 $location.path("/summaries");
             },
             is_selected: function(v){
-                return v == this.selected;
+                return v === this.selected;
             }
         };
     };
@@ -879,42 +899,78 @@ scApp.provider("$sc_nav", function(){
 // the sc server is the server we connected to.
 scApp.provider("$sc_server", [function(){
     this.$get = function(){
-        return {
+        var self = {
             schema: "http",
             host: null,
             port: 1985,
             rtmp: [1935],
             baseurl: function(){
-                return this.schema + "://" + this.host + (this.port == 80? "": ":" + this.port);
+                return self.schema + "://" + self.host + (self.port === 80? "": ":" + self.port);
             },
             jsonp: function(url){
-                return this.baseurl() + url + "?callback=JSON_CALLBACK";
+                return self.baseurl() + url + "?callback=JSON_CALLBACK";
             },
             jsonp_delete: function(url) {
-                return this.jsonp(url) + "&method=DELETE";
+                return self.jsonp(url) + "&method=DELETE";
             },
             jsonp_query: function(url, query){
-                return this.baseurl() + url + "?callback=JSON_CALLBACK&" + query;
+                return self.baseurl() + url + "?callback=JSON_CALLBACK&" + query;
+            },
+            buildNavUrl: function () {
+                var $location = self.$location;
+                var url = $location.absUrl();
+                if (url.indexOf('?') > 0) {
+                    url = url.substr(0, url.indexOf('?'));
+                }
+                url += '?';
+
+                var query = {};
+                for (var key in $location.search()) {
+                    query[key] = $location.search()[key];
+                }
+
+                query['schema'] = self.schema;
+                query['host'] = self.host;
+                query['port'] = self.port;
+
+                var queries = [];
+                for (var key in query) {
+                    var value = query[key];
+                    if (!Array.isArray(value)) {
+                        value = [value];
+                    }
+                    for (var i in value) {
+                        queries.push(key + '=' + value[i]);
+                    }
+                }
+                url += queries.join('&');
+
+                return url;
             },
             init: function($location, MSCApi) {
+                self.$location = $location;
+
                 // Set the right schema for proxy.
-                this.schema = $location.protocol();
+                if ($location.search().schema) {
+                    self.schema = $location.search().schema;
+                } else {
+                    self.schema = $location.protocol();
+                }
 
                 // query string then url.
                 if ($location.search().host) {
-                    this.host = $location.search().host;
+                    self.host = $location.search().host;
                 } else {
-                    this.host = $location.host();
+                    self.host = $location.host();
                 }
 
                 if ($location.search().port) {
-                    this.port = $location.search().port;
+                    self.port = $location.search().port;
                 } else {
-                    this.port = $location.port();
+                    self.port = $location.port();
                 }
 
                 // optional, init the rtmp port.
-                var self = this;
                 MSCApi.configs_get3(function(data){
                     if (data.minimal) {
                         self.rtmp = data.minimal.listen;
@@ -922,6 +978,7 @@ scApp.provider("$sc_server", [function(){
                 });
             }
         };
+        return self;
     };
 }]);
 
@@ -1000,13 +1057,13 @@ scApp.provider("$sc_utility", function(){
                     //console.log("k=" + key + ", v=" + typeof v + ", " + v);
 
                     var key = prefix? prefix + "." + k : k;
-                    if (key == "vhosts") {
+                    if (key === "vhosts") {
                         // use name as vhost id.
                         complex[k] = this.object2arr(v, function(e) { e.vid = e.name; });
                         continue;
                     }
 
-                    if (typeof v == "object" && v.constructor != Array) {
+                    if (typeof v === "object" && v.constructor !== Array) {
                         var cv = {};
                         complex[k] = cv;
 
@@ -1016,7 +1073,7 @@ scApp.provider("$sc_utility", function(){
 
                     // convert number to str for select to
                     // choose the right default one.
-                    if (key == "pithy_print_ms") {
+                    if (key === "pithy_print_ms") {
                         v = String(v);
                     }
 
@@ -1075,7 +1132,7 @@ scApp.directive('scCollapse', ["$sc_utility", function($sc_utility){
         }],
         compile: function(elem, attrs) {
             return function(scope, elem, attrs){
-                if (attrs.scCollapse == "in") {
+                if (attrs.scCollapse === "in") {
                     var obj = $sc_utility.find_siblings(elem, 'accordion-body');
                     obj.addClass('in');
                 }
@@ -1110,7 +1167,7 @@ scApp.directive("scPretty", [function(){
             + '<td>'
                 + '<span class="{{value == undefined? \'label\':\'\'}}">'
                     + '<span ng-show="bool && value != undefined">{{value| sc_filter_enabled}}</span>'
-                    + '<span ng-show="!bool || value == undefined">{{value| sc_filter_obj}}</span>'
+                    + '<span ng-show="!bool || value === undefined">{{value| sc_filter_obj}}</span>'
                 + '</span>'
             + '</td>'
             + '<td>{{desc}}</td>'
@@ -1198,7 +1255,7 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
             };
 
             // split select to array.
-            if (typeof $scope.select == "string" && $scope.select && !$scope.selects) {
+            if (typeof $scope.select === "string" && $scope.select && !$scope.selects) {
                 $scope.selects = $scope.select.split(",");
             }
 
@@ -1208,7 +1265,7 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
 
             $scope.commit = function() {
                 // for array, string to array.
-                if ($scope.array == "true" && typeof $scope.data.value == "string") {
+                if ($scope.array === "true" && typeof $scope.data.value === "string") {
                     $scope.data.value = $scope.data.value.split(",");
                 }
 
@@ -1221,10 +1278,10 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
             };
 
             $scope.load_default = function(){
-                if ($scope.default != undefined) {
-                    if ($scope.bool == "true") {
-                        $scope.data.value = $scope.default == "true";
-                    } else if ($scope.array == "true") {
+                if ($scope.default !== undefined) {
+                    if ($scope.bool === "true") {
+                        $scope.data.value = $scope.default === "true";
+                    } else if ($scope.array === "true") {
                         $scope.data.value = $scope.default.split(",");
                     } else {
                         $scope.data.value = $scope.default;
@@ -1238,7 +1295,7 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
                 }
 
                 // for array, always restore it when cancel.
-                if ($scope.array == "true") {
+                if ($scope.array === "true") {
                     $scope.data.value = $scope.old_data.value;
                 }
 
@@ -1270,7 +1327,7 @@ scApp.directive("scDirective", ["$sc_utility", function($sc_utility){
                 // start editing.
                 if (nv && !ov) {
                     // for array, array to string.
-                    if ($scope.array == "true") {
+                    if ($scope.array === "true") {
                         $scope.data.value = $scope.data.value.join(",");
                     }
                 }
@@ -1301,7 +1358,7 @@ scApp.factory('MHttpInterceptor', ["$q", "$sc_utility", function($q, $sc_utility
             return $q.reject(rejection);
         },
         'response': function(response) {
-            if (response.data.code && response.data.code != 0) {
+            if (response.data.code && response.data.code !== 0) {
                 $sc_utility.http_error(response.status, response.data);
                 // the $q.reject, will cause the error function of controller.
                 // @see: https://code.angularjs.org/1.2.0-rc.3/docs/api/ng.$q

@@ -10,8 +10,8 @@
                 <div class="accordion-inner">
                     <p>ID: {{client.id}}</p>
                     <p>IP: {{client.ip}}</p>
-                    <p>Vhost: <a href="#/vhosts/{{client.vhost}}">{{client.vhost}}</a></p>
-                    <p>Stream: <a href="#/streams/{{client.stream}}">{{client.stream}}</a></p>
+                    <p><a href="javascript:void(0)" ng-click="gogogo('/vhosts/' + client.vhost)">{{client.vhost}}</a></p>
+                    <p><a href="javascript:void(0)" ng-click="gogogo('/streams/' + client.stream)">{{client.stream}}</a></p>
                     <p>Type: {{client.publish| sc_filter_ctype}}</p>
                     <p>Alive: {{client.alive| sc_filter_time}}</p>
                     <p>TcUrl: {{client.tcUrl}}</p>

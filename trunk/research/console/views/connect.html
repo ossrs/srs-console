@@ -10,6 +10,12 @@
                 <div class="accordion-inner">
                     <div class="form-horizontal">
                         <div class="control-group">
+                            <label class="control-label" for="sscProtocol">协议</label>
+                            <div class="controls">
+                                <input type="text" id="sscProtocol" placeholder="SRS API Protocol, http or https" ng-model="server.schema">
+                            </div>
+                        </div>
+                        <div class="control-group">
                             <label class="control-label" for="sscServer">服务器IP</label>
                             <div class="controls">
                                 <input type="text" id="sscServer" placeholder="SRS API Server IP" ng-model="server.ip">

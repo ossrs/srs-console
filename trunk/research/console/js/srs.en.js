@@ -62,15 +62,15 @@ scApp.filter("sc_filter_ctype", function(){
 
 scApp.filter("sc_filter_obj", function(){
     return function(v) {
-        return v != undefined? v : "Unknown";
+        return v !== undefined? v : "Unknown";
     };
 });
 
 scApp.filter("sc_filter_security", function(){
     return function(v) {
-        var action = v.action == "allow"? "Allow":"Denied";
-        var method = v.method == "all"? "Any": (v.method == "publish"? "Publish":"Play");
-        var entry = v.entry == "all"? "All" : v.entry;
+        var action = v.action === "allow"? "Allow":"Denied";
+        var method = v.method === "all"? "Any": (v.method === "publish"? "Publish":"Play");
+        var entry = v.entry === "all"? "All" : v.entry;
         return action + " " + entry + " " + method;
     }
 });

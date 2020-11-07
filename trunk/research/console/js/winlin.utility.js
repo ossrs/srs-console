@@ -3,9 +3,9 @@
 /**
  * common utilities
  * depends: jquery1.10
- * https://code.csdn.net/snippets/147103
+ * https://gitee.com/winlinvip/codes/rpn0c2ewbomj81augzk4y59
  * @see: http://blog.csdn.net/win_lin/article/details/17994347
- * v 1.0.13
+ * v 1.0.22
  */
 
 /**
@@ -236,15 +236,28 @@ function parse_query_string(){
 
     // parse the query string.
     var query_string = String(window.location.search).replace(" ", "").split("?")[1];
-    if(query_string == undefined){
+    if(query_string === undefined){
         query_string = String(window.location.hash).replace(" ", "").split("#")[1];
-        if(query_string == undefined){
+        if(query_string === undefined){
             return obj;
         }
     }
 
+    __fill_query(query_string, obj);
+
+    return obj;
+}
+
+function __fill_query(query_string, obj) {
+    // pure user query object.
+    obj.user_query = {};
+
+    if (query_string.length === 0) {
+        return;
+    }
+
     // split again for angularjs.
-    if (query_string.indexOf("?") > 0) {
+    if (query_string.indexOf("?") >= 0) {
         query_string = query_string.split("?")[1];
     }
 
@@ -257,7 +270,10 @@ function parse_query_string(){
         obj.user_query[query[0]] = query[1];
     }
 
-    return obj;
+    // alias domain for vhost.
+    if (obj.domain) {
+        obj.vhost = obj.domain;
+    }
 }
 
 /**
@@ -277,10 +293,11 @@ function parse_query_string(){
 function parse_rtmp_url(rtmp_url) {
     // @see: http://stackoverflow.com/questions/10469575/how-to-use-location-object-to-parse-url-without-redirecting-the-page-in-javascri
     var a = document.createElement("a");
-    a.href = rtmp_url.replace("rtmp://", "http://").replace("?", "...").replace("=", "...");
+    a.href = rtmp_url.replace("rtmp://", "http://")
+        .replace("webrtc://", "http://")
+        .replace("rtc://", "http://");
 
     var vhost = a.hostname;
-    var port = (a.port == "")? "1935":a.port;
     var app = a.pathname.substr(1, a.pathname.lastIndexOf("/") - 1);
     var stream = a.pathname.substr(a.pathname.lastIndexOf("/") + 1);
 
@@ -300,17 +317,50 @@ function parse_rtmp_url(rtmp_url) {
 
     // when vhost equals to server, and server is ip,
     // the vhost is __defaultVhost__
-    if (a.hostname == vhost) {
+    if (a.hostname === vhost) {
         var re = /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
         if (re.test(a.hostname)) {
             vhost = "__defaultVhost__";
         }
     }
 
+    // parse the schema
+    var schema = "rtmp";
+    if (rtmp_url.indexOf("://") > 0) {
+        schema = rtmp_url.substr(0, rtmp_url.indexOf("://"));
+    }
+
+    var port = a.port;
+    if (!port) {
+        if (schema === 'http') {
+            port = 80;
+        } else if (schema === 'https') {
+            port = 443;
+        } else if (schema === 'rtmp') {
+            port = 1935;
+        }
+    }
+
     var ret = {
+        url: rtmp_url,
+        schema: schema,
         server: a.hostname, port: port,
         vhost: vhost, app: app, stream: stream
     };
+    __fill_query(a.search, ret);
+
+    // For webrtc API, we use 443 if page is https, or schema specified it.
+    if (!ret.port) {
+        if (schema === 'webrtc' || schema === 'rtc') {
+            if (ret.user_query.schema === 'https') {
+                ret.port = 443;
+            } else if (window.location.href.indexOf('https://') === 0) {
+                ret.port = 443;
+            } else {
+                ret.port = 80;
+            }
+        }
+    }
 
     return ret;
 }
@@ -633,10 +683,3 @@ AsyncRefresh2.prototype.request = function(timeout) {
     }, timeout);
 }
 
-// other components.
-/**
- * jquery/bootstrap pager.
- * depends: jquery1.10, boostrap2
- * https://code.csdn.net/snippets/146160
- * @see: http://blog.csdn.net/win_lin/article/details/17628631
- */

@@ -20,10 +20,10 @@
                             <th>管理</th>
                         </tr>
                         <tr ng-repeat="client in clients">
-                            <td><a href="#/clients/{{client.id}}">{{client.id}}</a></td>
+                            <td><a href="javascript:void(0)" ng-click="gogogo('/clients/' + client.id)">{{client.id}}</a></td>
                             <td>{{client.ip}}</td>
-                            <td><a href="#/vhosts/{{client.vhost}}">{{client.vhost}}</a></td>
-                            <td><a href="#/streams/{{client.stream}}">{{client.stream}}</a></td>
+                            <td><a href="javascript:void(0)" ng-click="gogogo('/vhosts/' + client.vhost)">{{client.vhost}}</a></td>
+                            <td><a href="javascript:void(0)" ng-click="gogogo('/streams/' + client.stream)">{{client.stream}}</a></td>
                             <td>{{client.publish| sc_filter_ctype}}</td>
                             <td>{{client.alive| sc_filter_time}}</td>
                             <td>{{client.tcUrl}}</td>
