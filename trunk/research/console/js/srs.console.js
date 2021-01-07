@@ -569,7 +569,7 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
             $http.jsonp(url).success(success);
         },
         vhosts_get: function(success) {
-            var url = $sc_server.jsonp("/api/v1/vhosts");
+            var url = $sc_server.jsonp("/api/v1/vhosts/");
             $http.jsonp(url).success(success);
         },
         vhosts_get2: function(id, success) {
@@ -577,7 +577,7 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
             $http.jsonp(url).success(success);
         },
         streams_get: function(success) {
-            var url = $sc_server.jsonp("/api/v1/streams");
+            var url = $sc_server.jsonp("/api/v1/streams/");
             $http.jsonp(url).success(success);
         },
         streams_get2: function(id, success) {
@@ -585,7 +585,7 @@ scApp.factory("MSCApi", ["$http", "$sc_server", function($http, $sc_server){
             $http.jsonp(url).success(success);
         },
         clients_get: function(success) {
-            var url = $sc_server.jsonp("/api/v1/clients");
+            var url = $sc_server.jsonp("/api/v1/clients/");
             $http.jsonp(url).success(success);
         },
         clients_get2: function(id, success) {
