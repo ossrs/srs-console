@@ -5,7 +5,7 @@
 
 ## Usage
 
-已经合并到了SRS项目，不需要手动拷贝了。
+已经合并到了[SRS项目](https://mp.weixin.qq.com/s/NnFi0dgJzoXBKDoQau0jCw)，不需要手动拷贝了。
 Merged to `trunk/research/console` of [SRS v3+](https://github.com/ossrs/srs).
 
 * 本机SRS演示（Local SRS demo）: [http://localhost:8080/console/](http://localhost:8080/console/)
