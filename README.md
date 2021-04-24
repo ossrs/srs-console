@@ -5,10 +5,10 @@
 
 ## Usage
 
-Put the HTML files under your WebServer:
+Put the HTML files under your WebServer, for example, [SRS](http://localhost:8080/console/):
 
 ```
-trunk/research/console
+ln -sf `pwd`/trunk/research/console ~/git/srs/trunk/objs/nginx/html/console
 ```
 
 Online demo: [http://ossrs.net/console](http://ossrs.net/console)
