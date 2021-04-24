@@ -5,12 +5,11 @@
 
 ## Usage
 
-Put the HTML files under your WebServer, for example, [SRS](http://localhost:8080/console/):
+已经合并到了SRS项目，不需要手动拷贝了。
+Merged to `trunk/research/console` of [SRS v3+](https://github.com/ossrs/srs).
 
-```
-ln -sf `pwd`/trunk/research/console ~/git/srs/trunk/objs/nginx/html/console
-```
+* 本机SRS演示（Local SRS demo）: [http://localhost:8080/console/](http://localhost:8080/console/)
 
-Online demo: [http://ossrs.net/console](http://ossrs.net/console)
+* 在线演示（Online demo）: [http://ossrs.net/console/](http://ossrs.net/console/)
 
 2020.10, Winlin.
