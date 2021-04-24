@@ -853,9 +853,9 @@ scApp.filter('sc_filter_style_error', function(){
 scApp.filter('sc_filter_preview_url', ['$sc_server', function($sc_server){
     return function(v){
         var page = $sc_server.schema + "://ossrs.net/players/srs_player.html";
-        var rtmp = $sc_server.rtmp[$sc_server.rtmp.length - 1];
-        var query = "vhost=" + v.owner.name + "&app=" + v.app + "&stream=" + v.name;
-        query += "&server=" + $sc_server.host +"&port=" + rtmp + "&autostart=true";
+        var http = $sc_server.http[$sc_server.http.length - 1];
+        var query = "vhost=" + v.owner.name + "&app=" + v.app + "&stream=" + v.name + ".flv";
+        query += "&server=" + $sc_server.host +"&port=" + http + "&autostart=true&schema=" + $sc_server.schema;
         return v? page+"?" + query:"javascript:void(0)";
     };
 }]);
@@ -904,6 +904,7 @@ scApp.provider("$sc_server", [function(){
             host: null,
             port: 1985,
             rtmp: [1935],
+            http: [8080],
             baseurl: function(){
                 return self.schema + "://" + self.host + (self.port === 80? "": ":" + self.port);
             },

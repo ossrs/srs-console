@@ -1,0 +1,22 @@
+<html>
+<head>
+    <title>SRS</title>
+    <meta charset="utf-8">
+</head>
+<body>
+<h3><a href="https://github.com/ossrs/srs">SRS</a> works!</h3>
+<p>
+    Click <a id="en" href="#">here</a> to enter SRS console.<br/>
+    点击进入<a id="cn" href="#">SRS控制台</a>
+</p>
+<p><a href="https://github.com/ossrs/srs">SRS Team &copy; 2020</a></p>
+<script type="text/javascript">
+    // http://localhost:8080/console/ng_index.html#/connect?port=1985
+    // http://localhost:8080/console/ng_index.html#/summaries?port=1985
+    var en_url = window.location.protocol + "//" + window.location.host + "/console/en_index.html#/summaries?port=1985";
+    var cn_url = window.location.protocol + "//" + window.location.host + "/console/ng_index.html#/summaries?port=1985";
+    document.getElementById("en").setAttribute('href', en_url);
+    document.getElementById("cn").setAttribute('href', cn_url);
+</script>
+</body>
+
